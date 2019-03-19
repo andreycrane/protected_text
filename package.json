@@ -1,0 +1,26 @@
+{
+  "name": "protected_text",
+  "version": "1.0.0",
+  "description": "Small service for storing encrypted notes",
+  "main": "index.js",
+  "scripts": {
+    "server:development": "webpack-dev-server --color --progress"
+  },
+  "author": "Andrey Zhuravlyov",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "clean-webpack-plugin": "^2.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1"
+  },
+  "dependencies": {
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4"
+  }
+}
