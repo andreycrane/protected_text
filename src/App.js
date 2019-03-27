@@ -1,15 +1,22 @@
+// @flow
+
 import React from 'react';
+import type { Node } from 'react';
 
 import Grid from '@material-ui/core/Grid';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 
-const styles = theme => ({
+import NotesArea from './NotesArea';
+
+export type TStyles = $ReadOnly<{
+  [string]: string | TStyles,
+}>;
+
+const styles = (): TStyles => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -26,10 +33,14 @@ const styles = theme => ({
   tabs: {
     flexGrow: '1 1 auto',
     alignSelf: 'stretch',
-  }
+  },
 });
 
-export function AppComponent({ classes }) {
+export type TProps = $ReadOnly<{
+  classes: TStyles,
+}>;
+
+export function AppComponent({ classes }: TProps): Node {
   return (
     <CssBaseline>
       <Grid
@@ -57,11 +68,7 @@ export function AppComponent({ classes }) {
           xs={12}
           className={classes.tabs}
         >
-          <Tabs value="one">
-            <Tab value="one" label="Item One" />
-            <Tab value="two" label="Item Two" />
-            <Tab value="three" label="Item Three" />
-          </Tabs>
+          <NotesArea />
         </Grid>
       </Grid>
     </CssBaseline>
