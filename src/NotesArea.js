@@ -1,120 +1,77 @@
 // @flow
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Node } from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
 import AccessAlarmIcon from '@material-ui/icons/AddCircle';
 import IconButton from '@material-ui/core/IconButton';
-import {
-  Editor,
-  EditorState,
-  ContentState,
-  convertToRaw,
-  convertFromRaw,
-} from 'draft-js';
+import { ContentState, convertToRaw } from 'draft-js';
 
+import type { TNotes, TNote } from './types';
 import TabLabel from './TabLabel';
+import Editor from './Editor';
 
-export type TTab = {
-  id: string,
-  label: string,
-};
+export type TProps = $ReadOnly<{
+  notes: TNotes,
+  onNewNote: () => void,
+  onRemoveNote: (id: string) => void,
+  onUpdateNote: (note: TNote) => void,
+}>;
 
-export type TTabs = $ReadOnlyArray<TTab>;
+export default function NotesArea(props: TProps): Node {
+  const {
+    notes,
+    onNewNote,
+    onUpdateNote,
+    onRemoveNote,
+  } = props;
 
-export function genId(): string {
-  return `_${Math.random().toString(36).substr(2, 9)}`;
-}
+  const [currentNote, setCurrentNote] = useState(notes[0]);
 
-const tabsStorage: TTabs = [
-  {
-    id: genId(),
-    label: 'text 1',
-    rawContent: convertToRaw(ContentState.createFromText('Test 1')),
-  },
-  {
-    id: genId(),
-    label: 'text 2',
-    rawContent: convertToRaw(ContentState.createFromText('Test 2')),
-  },
-  {
-    id: genId(),
-    label: 'text 3',
-    rawContent: convertToRaw(ContentState.createFromText('Test 3')),
-  },
-];
-
-
-function getEditorState(tabs, currentTab) {
-  const tabObject = tabs.find((t): boolean => t.id === currentTab);
-  const contentState = convertFromRaw(tabObject.rawContent);
-  return EditorState.createWithContent(contentState);
-}
-
-export default function NotesArea(): Node {
-  const [tabs, setTabs] = useState(tabsStorage);
-  const [currentTab, setCurrentTab] = useState(tabs[0].id);
-  const [editorState, setEditorState] = useState(getEditorState(tabs, currentTab));
+  useEffect(
+    () => {
+      const note = notes.find((n): boolean => n.id === currentNote.id);
+      if (note) {
+        setCurrentNote(note);
+      } else {
+        setCurrentNote(notes[0]);
+      }
+    },
+    [notes.length],
+  );
 
   function handleAdd(event): boolean {
     event.stopPropagation();
     event.preventDefault();
-    const id = genId();
 
-    setTabs([
-      ...tabs,
-      {
-        id,
-        label: `Tab ${tabs.length + 1}`,
-        rawContent: null,
-      },
-    ]);
-    setCurrentTab(id);
+    onNewNote();
 
     return false;
   }
 
-  function handleRemove(id: string) {
-    setCurrentTab(tabs[0].id);
-    setTabs(tabs.filter((t): boolean => t.id !== id));
-  }
+  function handleTabChange(event, newTabId) {
+    const note = notes.find((t): boolean => t.id === newTabId);
 
-  function handleTabChange(event, newTab) {
-    setCurrentTab(newTab);
-    setEditorState(
-      getEditorState(tabs, newTab)
-    );
-  }
-
-  function handleEditorChange(newEditorState) {
-    setTabs(
-      tabs.map(t => {
-        if (t.id === currentTab) {
-          return {
-            ...t,
-            rawContent: convertToRaw(editorState.getCurrentContent()),
-          };
-        }
-
-        return t;
-      })
-    );
-    setEditorState(newEditorState);
+    if (note) {
+      setCurrentNote(
+        note,
+      );
+    }
   }
 
   return (
     <React.Fragment>
       <Tabs
         onChange={handleTabChange}
-        value={currentTab}
+        value={currentNote.id}
         indicatorColor="primary"
         textColor="primary"
         variant="scrollable"
         scrollButtons="auto"
       >
-        {tabs.map(({ id, label }): Node => (
+        {notes.map(({ id, label }): Node => (
           <Tab
             component="div"
             key={id}
@@ -123,7 +80,7 @@ export default function NotesArea(): Node {
               <TabLabel
                 id={id}
                 label={label}
-                onRemove={handleRemove}
+                onRemove={onRemoveNote}
               />
             )}
           />
@@ -152,8 +109,8 @@ export default function NotesArea(): Node {
         />
       </Tabs>
       <Editor
-        editorState={editorState}
-        onChange={handleEditorChange}
+        note={currentNote}
+        onChange={onUpdateNote}
       />
     </React.Fragment>
   );
