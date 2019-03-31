@@ -6,9 +6,8 @@ import { genId, getPreferredNeighbor } from '../lib';
 
 export type TState = $ReadOnly<{
   notes: TNotes,
-  currentId: string,
+  currentId: string | null,
 }>;
-
 
 export type TAction =
   $ReadOnly<{ type: 'NEW_NOTE' }> |
@@ -35,6 +34,7 @@ export function newNoteOp(state: TState): TState {
   const newNote = getNewNote(notes);
 
   return {
+    ...state,
     currentId: newNote.id,
     notes: [...notes, newNote],
   };
@@ -52,6 +52,7 @@ export function removeNoteOp(state: TState, removeId: string): TState {
     const newNote = getNewNote(notes);
 
     return {
+      ...state,
       currentId: newNote.id,
       notes: [newNote],
     };
@@ -62,6 +63,7 @@ export function removeNoteOp(state: TState, removeId: string): TState {
 
     if (preferred) {
       return {
+        ...state,
         notes: notes.filter((n: TNote): boolean => n.id !== removeNote.id),
         currentId: preferred.id,
       };
@@ -109,6 +111,13 @@ export function changeCurrentOp(state: TState, newId: string): TState {
 }
 
 export function initState(initialNotes: TNotes): TState {
+  if (initialNotes.length === 0) {
+    return {
+      notes: [],
+      currentId: null,
+    };
+  }
+
   return {
     notes: initialNotes,
     currentId: initialNotes[0].id,
