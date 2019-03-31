@@ -4,18 +4,18 @@ import React, { useReducer, useCallback } from 'react';
 import type { Node } from 'react';
 
 import Grid from '@material-ui/core/Grid';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 
 import NotesArea from './NotesArea';
+import TopBar from './TopBar';
+import {
+  PasswordRequiredDialog,
+  CreateNewDialog,
+  ChangePasswordDialog,
+  CreatePasswordDialog,
+} from './Dialogs';
 import reducer, { initState } from './duck';
-
-export type TStyles = $ReadOnly<{
-  [string]: string | TStyles,
-}>;
 
 const styles = (): TStyles => ({
   container: {
@@ -67,13 +67,7 @@ export function AppComponent(props: TProps): Node {
           xs={12}
           className={classes.appbar}
         >
-          <AppBar position="relative">
-            <Toolbar>
-              <Typography variant="h6" color="inherit">
-                Protected Text
-              </Typography>
-            </Toolbar>
-          </AppBar>
+          <TopBar />
         </Grid>
         <Grid
           item
@@ -92,6 +86,10 @@ export function AppComponent(props: TProps): Node {
           )}
         </Grid>
       </Grid>
+      <PasswordRequiredDialog />
+      <CreateNewDialog />
+      <ChangePasswordDialog />
+      <CreatePasswordDialog />
     </CssBaseline>
   );
 }

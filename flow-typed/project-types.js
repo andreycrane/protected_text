@@ -9,3 +9,7 @@ declare type TNote = $ReadOnly<{
 }>;
 
 declare type TNotes = $ReadOnlyArray<TNote>;
+
+declare type TStyles = $ReadOnly<{
+  [string]: string | TStyles,
+}>;
