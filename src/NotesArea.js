@@ -1,46 +1,35 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import type { Node } from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
 import AccessAlarmIcon from '@material-ui/icons/AddCircle';
 import IconButton from '@material-ui/core/IconButton';
-import { ContentState, convertToRaw } from 'draft-js';
 
-import type { TNotes, TNote } from './types';
+import type { TNote, TTabs } from './types';
 import TabLabel from './TabLabel';
 import Editor from './Editor';
 
 export type TProps = $ReadOnly<{
-  notes: TNotes,
+  tabs: TTabs,
+  currentNote: TNote,
   onNewNote: () => void,
   onRemoveNote: (id: string) => void,
   onUpdateNote: (note: TNote) => void,
+  onChangeCurrent: (newId: string) => void,
 }>;
 
 export default function NotesArea(props: TProps): Node {
   const {
-    notes,
+    tabs,
+    currentNote,
     onNewNote,
     onUpdateNote,
     onRemoveNote,
+    onChangeCurrent,
   } = props;
-
-  const [currentNote, setCurrentNote] = useState(notes[0]);
-
-  useEffect(
-    () => {
-      const note = notes.find((n): boolean => n.id === currentNote.id);
-      if (note) {
-        setCurrentNote(note);
-      } else {
-        setCurrentNote(notes[0]);
-      }
-    },
-    [notes.length],
-  );
 
   function handleAdd(event): boolean {
     event.stopPropagation();
@@ -51,27 +40,21 @@ export default function NotesArea(props: TProps): Node {
     return false;
   }
 
-  function handleTabChange(event, newTabId) {
-    const note = notes.find((t): boolean => t.id === newTabId);
-
-    if (note) {
-      setCurrentNote(
-        note,
-      );
-    }
+  function handleChangeCurrent(event, value) {
+    onChangeCurrent(value);
   }
 
   return (
     <React.Fragment>
       <Tabs
-        onChange={handleTabChange}
+        onChange={handleChangeCurrent}
         value={currentNote.id}
         indicatorColor="primary"
         textColor="primary"
         variant="scrollable"
         scrollButtons="auto"
       >
-        {notes.map(({ id, label }): Node => (
+        {tabs.map(({ id, label }): Node => (
           <Tab
             component="div"
             key={id}

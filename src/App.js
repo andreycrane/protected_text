@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState } from 'react';
+import React, { useReducer, useCallback } from 'react';
 import type { Node } from 'react';
 
 import Grid from '@material-ui/core/Grid';
@@ -9,11 +9,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
-import { ContentState, convertToRaw } from 'draft-js';
 
 import type { TNotes, TNote } from './types';
-import { genId } from './lib';
 import NotesArea from './NotesArea';
+import reducer, { initState } from './duck';
 
 export type TStyles = $ReadOnly<{
   [string]: string | TStyles,
@@ -46,37 +45,14 @@ export type TProps = $ReadOnly<{
 
 export function AppComponent(props: TProps): Node {
   const { classes, initialNotes } = props;
-  const [notes, setNotes] = useState(initialNotes);
+  const [state, dispatch] = useReducer(reducer, initialNotes, initState);
 
-  function onNewNote() {
-    const newLabel = `Note ${notes.length + 1}`;
-    const newNote = {
-      id: genId(),
-      label: `Note ${notes.length + 1}`,
-      rawContent: convertToRaw(
-        ContentState.createFromText(newLabel),
-      ),
-    };
+  const currentNote = state.notes.find((n: TNote): boolean => n.id === state.currentId);
 
-    setNotes([
-      ...notes,
-      newNote,
-    ]);
-  }
-
-  function onRemoveNote(id: string) {
-    setNotes(notes.filter((n): boolean => n.id !== id));
-  }
-
-  function onUpdateNote(note: TNote) {
-    setNotes(notes.map((n): TNote => {
-      if (n.id === note.id) {
-        return note;
-      }
-
-      return n;
-    }));
-  }
+  const onNewNote = useCallback((): void => dispatch({ type: 'NEW_NOTE' }));
+  const onRemoveNote = useCallback((id: string): void => dispatch({ type: 'REMOVE_NOTE', id }));
+  const onChangeCurrent = useCallback((newId: string): void => dispatch({ type: 'CHANGE_CURRENT', newId }));
+  const onUpdateNote = useCallback((note: TNote): void => dispatch({ type: 'UPDATE_NOTE', note }));
 
   return (
     <CssBaseline>
@@ -105,12 +81,16 @@ export function AppComponent(props: TProps): Node {
           xs={12}
           className={classes.tabs}
         >
-          <NotesArea
-            notes={notes}
-            onNewNote={onNewNote}
-            onUpdateNote={onUpdateNote}
-            onRemoveNote={onRemoveNote}
-          />
+          {currentNote && (
+            <NotesArea
+              tabs={state.notes}
+              currentNote={currentNote}
+              onNewNote={onNewNote}
+              onUpdateNote={onUpdateNote}
+              onRemoveNote={onRemoveNote}
+              onChangeCurrent={onChangeCurrent}
+            />
+          )}
         </Grid>
       </Grid>
     </CssBaseline>
