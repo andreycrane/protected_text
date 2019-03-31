@@ -23,6 +23,7 @@ module.exports = {
   plugins: [
     'flowtype',
     'react',
+    'jest'
   ],
   rules: {
     "react/jsx-filename-extension": [
@@ -41,4 +42,17 @@ module.exports = {
     'flowtype/no-weak-types': ['error'],
     'flowtype/require-return-type': ['error', 'always'],
   },
+  overrides: {
+    files: [
+      "*.test.js",
+    ],
+    env: {
+      'jest/globals': true,
+    },
+    settings: {
+      flowtype: {
+        onlyFilesWithFlowAnnotation: true
+      }
+    },
+  }
 };

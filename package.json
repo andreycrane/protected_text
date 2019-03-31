@@ -4,7 +4,9 @@
   "description": "Small service for storing encrypted notes",
   "main": "index.js",
   "scripts": {
-    "server:development": "webpack-dev-server --color --progress"
+    "server:development": "webpack-dev-server --color --progress",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "author": "Andrey Zhuravlyov",
   "license": "ISC",
@@ -15,6 +17,7 @@
     "@babel/preset-react": "^7.0.0",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.5.0",
     "babel-loader": "^8.0.5",
     "babel-preset-flow": "^6.23.0",
     "clean-webpack-plugin": "^2.0.1",
@@ -23,11 +26,13 @@
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-flowtype": "^3.4.2",
     "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jest": "^22.4.1",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
     "flow-bin": "^0.95.1",
     "flow-typed": "^2.5.1",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^24.5.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
