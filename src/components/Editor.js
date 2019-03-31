@@ -9,22 +9,22 @@ import {
   convertFromRaw,
 } from 'draft-js';
 
-import type { TNote } from './types';
+import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
+
+function getEditorState(note: TNote): EditorState {
+  const contentState = convertFromRaw(note.rawContent);
+  return EditorState.createWithContent(contentState);
+}
+
+function getRawContent(editorState): RawDraftContentState {
+  const currentContent = editorState.getCurrentContent();
+  return convertToRaw(currentContent);
+}
 
 export type TProps = $ReadOnly<{
   note: TNote,
   onChange: (note: TNote) => void,
 }>;
-
-function getEditorState(note: TNote) {
-  const contentState = convertFromRaw(note.rawContent);
-  return EditorState.createWithContent(contentState);
-}
-
-function getRawContent(editorState) {
-  const currentContent = editorState.getCurrentContent();
-  return convertToRaw(currentContent);
-}
 
 export default function NoteEditor(props: TProps): Node {
   const { note, onChange } = props;

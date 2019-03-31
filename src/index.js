@@ -4,29 +4,28 @@ import React from 'react';
 import { render } from 'react-dom';
 import { ContentState, convertToRaw } from 'draft-js';
 
-import type { TNotes } from './types';
 import { genId } from './lib';
 
-import App from './App';
-import './styles.css';
+import App from './components/App';
+import './styles/index.css';
 
 const rootDiv = document.createElement('div');
 
 const notes: TNotes = [
   {
     id: genId(),
-    label: 'text 1',
-    rawContent: convertToRaw(ContentState.createFromText('Test 1')),
+    label: 'Note 1',
+    rawContent: convertToRaw(ContentState.createFromText('Note 1')),
   },
   {
     id: genId(),
-    label: 'text 2',
-    rawContent: convertToRaw(ContentState.createFromText('Test 2')),
+    label: 'Note 2',
+    rawContent: convertToRaw(ContentState.createFromText('Note 2')),
   },
   {
     id: genId(),
-    label: 'text 3',
-    rawContent: convertToRaw(ContentState.createFromText('Test 3')),
+    label: 'Note 3',
+    rawContent: convertToRaw(ContentState.createFromText('Note 3')),
   },
 ];
 

@@ -2,5 +2,7 @@ node_modules
 dist/*
 tags
 coverage
+flow-typed/*
 
 !dist/.gitkeep
+!flow-typed/project-types.js

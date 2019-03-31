@@ -10,7 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 
-import type { TNotes, TNote } from './types';
 import NotesArea from './NotesArea';
 import reducer, { initState } from './duck';
 
@@ -83,7 +82,7 @@ export function AppComponent(props: TProps): Node {
         >
           {currentNote && (
             <NotesArea
-              tabs={state.notes}
+              notes={state.notes}
               currentNote={currentNote}
               onNewNote={onNewNote}
               onUpdateNote={onUpdateNote}

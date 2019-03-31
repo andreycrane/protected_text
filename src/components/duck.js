@@ -2,8 +2,7 @@
 
 import { ContentState, convertToRaw } from 'draft-js';
 
-import { genId, getPreferredNeighbor } from './lib';
-import type { TNotes, TNote } from './types';
+import { genId, getPreferredNeighbor } from '../lib';
 
 export type TState = $ReadOnly<{
   notes: TNotes,

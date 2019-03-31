@@ -8,12 +8,11 @@ import Grid from '@material-ui/core/Grid';
 import AccessAlarmIcon from '@material-ui/icons/AddCircle';
 import IconButton from '@material-ui/core/IconButton';
 
-import type { TNote, TTabs } from './types';
 import TabLabel from './TabLabel';
 import Editor from './Editor';
 
 export type TProps = $ReadOnly<{
-  tabs: TTabs,
+  notes: TNotes,
   currentNote: TNote,
   onNewNote: () => void,
   onRemoveNote: (id: string) => void,
@@ -23,7 +22,7 @@ export type TProps = $ReadOnly<{
 
 export default function NotesArea(props: TProps): Node {
   const {
-    tabs,
+    notes,
     currentNote,
     onNewNote,
     onUpdateNote,
@@ -54,7 +53,7 @@ export default function NotesArea(props: TProps): Node {
         variant="scrollable"
         scrollButtons="auto"
       >
-        {tabs.map(({ id, label }): Node => (
+        {notes.map(({ id, label }): Node => (
           <Tab
             component="div"
             key={id}
