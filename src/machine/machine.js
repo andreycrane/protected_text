@@ -1,5 +1,17 @@
 // @flow
+
 import { Machine, assign, send } from 'xstate'; // or use your own interpreter!
+
+import {
+  decrypt,
+  createEmpty,
+} from './actions';
+
+import {
+  wasSiteCreated,
+  wasSiteFree,
+  wasSiteDecrypted,
+} from './guards';
 
 const machine = Machine(
   {
@@ -49,33 +61,15 @@ const machine = Machine(
   },
   {
     actions: {
-      decrypt: assign((ctx, event) => {
-        return ({
-          ...ctx,
-          notes: [],
-        });
-      }),
-      createEmpty: assign((ctx, event) => {
-        return ({
-          ...ctx,
-          notes: [],
-        });
-      }),
-      close(ctx, event) {
-      },
-      idleEntry(ctx, event) {
-      },
+      decrypt: assign(decrypt),
+      createEmpty: assign(createEmpty),
+      close(ctx, event) {},
+      idleEntry(ctx, event) {},
     },
     guards: {
-      wasSiteCreated(ctx, event) {
-        return (typeof ctx.encrypted === 'string');
-      },
-      wasSiteFree(ctx, event) {
-        return (ctx.encrypted === null);
-      },
-      wasSiteDecrypted(ctx, event) {
-        return Array.isArray(ctx.notes);
-      },
+      wasSiteCreated,
+      wasSiteFree,
+      wasSiteDecrypted,
     },
   },
 );
