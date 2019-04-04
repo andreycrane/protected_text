@@ -55,6 +55,7 @@ const machine = Machine(
         },
       },
       IDLE: {
+        type: 'final',
         onEntry: ['idleEntry'],
       },
     },
