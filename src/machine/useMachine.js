@@ -5,8 +5,7 @@ import { interpret } from 'xstate';
 
 export default function useMachine(machine) {
   // Keep track of the current machine state
-  const { initialState, context } = machine;
-  const [current, setCurrent] = useState({ state: initialState, ...context });
+  const [current, setCurrent] = useState(machine.initialState);
 
   // Reference the service
   const serviceRef = useRef(null);

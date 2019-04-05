@@ -5,6 +5,8 @@ import { Machine, assign, send } from 'xstate'; // or use your own interpreter!
 import {
   decrypt,
   createEmpty,
+  close,
+  idleEnrty,
 } from './actions';
 
 import {
@@ -64,8 +66,8 @@ const machine = Machine(
     actions: {
       decrypt: assign(decrypt),
       createEmpty: assign(createEmpty),
-      close(ctx, event) {},
-      idleEntry(ctx, event) {},
+      close,
+      idleEnrty,
     },
     guards: {
       wasSiteCreated,
