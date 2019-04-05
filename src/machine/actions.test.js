@@ -1,9 +1,10 @@
-import { random, lorem } from 'faker';
+import { helpers, random, lorem } from 'faker';
 
 import {
   newNoteAction,
   removeNoteAction,
 } from './actions';
+import { getPreferredNeighbor } from '../lib';
 
 describe('machine#actions', () => {
   describe('newNoteAction', () => {
@@ -72,6 +73,24 @@ describe('machine#actions', () => {
         expect.not.arrayContaining([oldNote]),
       );
       expect(newCtx).toHaveProperty('currentId', newCtx.notes[0].id);
+    });
+
+    it('moves currentId to preferred neighbor of removed note', () => {
+      const currentId = random.uuid();
+      const removeNote = { id: currentId, label: lorem.word() };
+      const notes = helpers.shuffle([
+        removeNote,
+        { id: random.uuid(), label: lorem.word() },
+        { id: random.uuid(), label: lorem.word() },
+      ]);
+      const oldCtx = {
+        currentId,
+        notes,
+      };
+      const preferred = getPreferredNeighbor(notes, removeNote);
+
+      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id: currentId } });
+      expect(newCtx).toHaveProperty('currentId', preferred.id);
     });
   });
 });
