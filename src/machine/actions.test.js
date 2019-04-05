@@ -3,6 +3,7 @@ import { helpers, random, lorem } from 'faker';
 import {
   newNoteAction,
   removeNoteAction,
+  changeCurrentAction,
 } from './actions';
 import { getPreferredNeighbor } from '../lib';
 
@@ -56,7 +57,7 @@ describe('machine#actions', () => {
       };
 
       const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id } });
-      expect(newCtx).toEqual(oldCtx);
+      expect(newCtx).toStrictEqual(oldCtx);
     });
 
     it('creates new note if last note was removed', () => {
@@ -91,6 +92,50 @@ describe('machine#actions', () => {
 
       const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id: currentId } });
       expect(newCtx).toHaveProperty('currentId', preferred.id);
+    });
+  });
+
+  describe('changeCurrentAction', () => {
+    it('returns same context if newId equal currentId', () => {
+      const newId = random.uuid();
+      const oldCtx = {
+        currentId: newId,
+      };
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      expect(newCtx).toStrictEqual(oldCtx);
+    });
+
+    it('returns same context if newId doesn\'t exist', () => {
+      const newId = random.uuid();
+      const notes = [
+        { id: random.uuid() },
+        { id: random.uuid() },
+        { id: random.uuid() },
+        { id: random.uuid() },
+      ];
+      const oldCtx = {
+        currentId: notes[0].id,
+        notes,
+      };
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      expect(newCtx).toStrictEqual(oldCtx);
+    });
+
+    it('sets currentId to newId', () => {
+      const newId = random.uuid();
+      const currentId = random.uuid();
+      const notes = helpers.shuffle([
+        { id: newId },
+        { id: currentId },
+        { id: random.uuid() },
+        { id: random.uuid() },
+      ]);
+      const oldCtx = {
+        currentId,
+        notes,
+      };
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      expect(newCtx).toMatchObject({ currentId: newId });
     });
   });
 });

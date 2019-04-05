@@ -100,20 +100,20 @@ export function updateNoteOp(state: TState, note: TNote): TState {
   };
 }
 
-export function changeCurrentOp(state: TState, newId: string): TState {
-  const { notes, currentId } = state;
+export function changeCurrentAction(ctx, { payload: { newId } }) {
+  const { notes, currentId } = ctx;
 
   if (currentId === newId) {
-    return state;
+    return ctx;
   }
 
   const newCurrent = notes.find((n: TNote): boolean => n.id === newId);
   if (!newCurrent) {
-    return state;
+    return ctx;
   }
 
   return {
-    ...state,
+    ...ctx,
     currentId: newId,
   };
 }
