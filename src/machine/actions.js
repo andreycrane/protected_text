@@ -84,8 +84,8 @@ export function removeNoteAction(ctx, { payload: { id } }) {
   };
 }
 
-export function updateNoteOp(state: TState, note: TNote): TState {
-  const { notes } = state;
+export function updateNoteAction(ctx, { payload: { note } }) {
+  const { notes } = ctx;
   const newNotes: TNotes = notes.map((n): TNote => {
     if (n.id === note.id) {
       return note;
@@ -95,7 +95,7 @@ export function updateNoteOp(state: TState, note: TNote): TState {
   });
 
   return {
-    ...state,
+    ...ctx,
     notes: newNotes,
   };
 }

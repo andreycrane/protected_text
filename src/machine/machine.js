@@ -6,7 +6,7 @@ import {
   decrypt,
   createEmpty,
   close,
-  idleEnrty,
+  idleEntry,
 } from './actions';
 
 import {
@@ -67,7 +67,7 @@ const machine = Machine(
       decrypt: assign(decrypt),
       createEmpty: assign(createEmpty),
       close,
-      idleEnrty,
+      idleEntry,
     },
     guards: {
       wasSiteCreated,

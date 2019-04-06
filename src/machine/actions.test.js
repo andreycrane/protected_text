@@ -4,6 +4,7 @@ import {
   newNoteAction,
   removeNoteAction,
   changeCurrentAction,
+  updateNoteAction,
 } from './actions';
 import { getPreferredNeighbor } from '../lib';
 
@@ -136,6 +137,31 @@ describe('machine#actions', () => {
       };
       const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
       expect(newCtx).toMatchObject({ currentId: newId });
+    });
+  });
+
+  describe('updateNoteAction', () => {
+    it('returns same context if updating note doesn\'t exists', () => {
+      const oldCtx = {
+        notes: [{ id: random.uuid(), label: lorem.word() }],
+      };
+      const note = { id: random.uuid(), label: lorem.word() };
+      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', payload: { note } });
+
+      expect(newCtx).toStrictEqual(oldCtx);
+    });
+
+    it('updates existing note', () => {
+      const id = random.uuid();
+      const oldCtx = {
+        notes: [{ id, label: lorem.word() }],
+      };
+      const note = { id, label: lorem.word() };
+      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', payload: { note } });
+
+      expect(newCtx.notes).toEqual(
+        expect.arrayContaining([note]),
+      );
     });
   });
 });
