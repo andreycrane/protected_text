@@ -1,10 +1,8 @@
 // @flow
 
-import { encrypt } from '../lib';
-
-export default function initContext() {
+export default function initContext(encrypted: string | null, name: string) {
   return {
-    encrypted: encrypt({ notes: [] }, 'test123'),
-    name: 'test_domain',
+    encrypted,
+    name,
   };
 }

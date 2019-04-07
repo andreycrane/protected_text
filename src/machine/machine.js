@@ -24,14 +24,14 @@ import {
   encryptService,
 } from './services';
 
+import initContext from './context';
+
 const machine = Machine(
   {
     strict: true,
     id: 'machine',
     initial: 'INITIAL',
-    context: {
-      encrypted: null,
-    },
+    context: initContext(null, 'site_name'),
     states: {
       INITIAL: {
         on: {
