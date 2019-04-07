@@ -24,7 +24,6 @@ describe('machine#actions', () => {
       };
 
       const newCtx = newNoteAction(oldCtx);
-
       expect(newCtx).toHaveProperty('notes.length', oldCtx.notes.length + 1);
     });
 
@@ -47,7 +46,7 @@ describe('machine#actions', () => {
       const notes = [firstNote, secondNote];
 
       const oldCtx = { notes };
-      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id } });
+      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', id });
 
       expect(newCtx).toHaveProperty('notes.length', oldCtx.notes.length - 1);
       expect(newCtx.note).toEqual(
@@ -64,7 +63,7 @@ describe('machine#actions', () => {
         ],
       };
 
-      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id } });
+      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', id });
       expect(newCtx).toStrictEqual(oldCtx);
     });
 
@@ -76,7 +75,7 @@ describe('machine#actions', () => {
         notes: [oldNote],
       };
 
-      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id } });
+      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', id });
       expect(newCtx).toHaveProperty('notes.length', 1);
       expect(newCtx.note).toEqual(
         expect.not.arrayContaining([oldNote]),
@@ -98,7 +97,7 @@ describe('machine#actions', () => {
       };
       const preferred = getPreferredNeighbor(notes, removeNote);
 
-      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', payload: { id: currentId } });
+      const newCtx = removeNoteAction(oldCtx, { type: 'REMOVE_NOTE', id: currentId });
       expect(newCtx).toHaveProperty('currentId', preferred.id);
     });
   });
@@ -109,7 +108,7 @@ describe('machine#actions', () => {
       const oldCtx = {
         currentId: newId,
       };
-      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', newId });
       expect(newCtx).toStrictEqual(oldCtx);
     });
 
@@ -125,7 +124,7 @@ describe('machine#actions', () => {
         currentId: notes[0].id,
         notes,
       };
-      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', newId });
       expect(newCtx).toStrictEqual(oldCtx);
     });
 
@@ -142,7 +141,7 @@ describe('machine#actions', () => {
         currentId,
         notes,
       };
-      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', payload: { newId } });
+      const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', newId });
       expect(newCtx).toMatchObject({ currentId: newId });
     });
   });
@@ -153,7 +152,7 @@ describe('machine#actions', () => {
         notes: [{ id: random.uuid(), label: lorem.word() }],
       };
       const note = { id: random.uuid(), label: lorem.word() };
-      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', payload: { note } });
+      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', note });
 
       expect(newCtx).toStrictEqual(oldCtx);
     });
@@ -164,7 +163,7 @@ describe('machine#actions', () => {
         notes: [{ id, label: lorem.word() }],
       };
       const note = { id, label: lorem.word() };
-      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', payload: { note } });
+      const newCtx = updateNoteAction(oldCtx, { type: 'UPDATE_NOTE', note });
 
       expect(newCtx.notes).toEqual(
         expect.arrayContaining([note]),

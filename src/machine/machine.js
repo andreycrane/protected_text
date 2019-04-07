@@ -11,6 +11,12 @@ import {
   createEmptyAction,
   closeAction,
   idleEntryAction,
+
+  newNoteAction,
+  removeNoteAction,
+  updateNoteAction,
+
+  changeCurrentAction,
 } from './actions';
 
 import {
@@ -86,7 +92,41 @@ const machine = Machine(
           },
         },
       },
-      IDLE: {},
+      IDLE: {
+        on: {
+          NEW_NOTE: {
+            target: '#machine.MODIFIED',
+            actions: 'newNote',
+          },
+          REMOVE_NOTE: {
+            target: '#machine.MODIFIED',
+            actions: 'removeNote',
+          },
+          UPDATE_NOTE: {
+            target: '#machine.MODIFIED',
+            actions: 'updateNote',
+          },
+          CHANGE_CURRENT: {
+            actions: 'changeCurrent',
+          },
+        },
+      },
+      MODIFIED: {
+        on: {
+          NEW_NOTE: {
+            actions: 'newNote',
+          },
+          REMOVE_NOTE: {
+            actions: 'removeNote',
+          },
+          UPDATE_NOTE: {
+            actions: 'updateNote',
+          },
+          CHANGE_CURRENT: {
+            actions: 'changeCurrent',
+          },
+        },
+      },
     },
   },
   {
@@ -95,6 +135,12 @@ const machine = Machine(
       createEmpty: assign(createEmptyAction),
       close: closeAction,
       idleEntry: idleEntryAction,
+
+      newNote: assign(newNoteAction),
+      removeNote: assign(removeNoteAction),
+      updateNote: assign(updateNoteAction),
+
+      changeCurrent: assign(changeCurrentAction),
     },
     guards: {
       wasSiteCreated,

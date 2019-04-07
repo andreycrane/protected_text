@@ -1,12 +1,12 @@
 import { interpret, State } from 'xstate';
-import { internet } from 'faker';
+import { random, internet } from 'faker';
 
 import { encrypt } from '../lib';
 
 import machine from './machine';
 import initContext from './context';
 
-describe.only('machine', () => {
+describe('machine', () => {
   describe('INITIAL state', () => {
     it('moves from INITIAL state to ENCRYPTED state', (done) => {
       const initialContext = initContext('enrypted_data', 'site_name');
@@ -133,6 +133,188 @@ describe.only('machine', () => {
         })
         .start(EncryptedErrorState)
         .send({ type: 'DECRYPT', password: internet.password() });
+    });
+  });
+
+  describe('IDLE state', () => {
+    it('moves to MODIFIED on NEW_NOTE', (done) => {
+      const context = {
+        notes: [],
+      };
+      const IdleState = State.create({
+        value: 'IDLE',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(IdleState)
+        .send('NEW_NOTE');
+    });
+
+    it('moves to MODIFIED on REMOVE_NOTE', (done) => {
+      const id = random.uuid();
+      const context = {
+        notes: [{ id, label: random.words() }],
+      };
+      const IdleState = State.create({
+        value: 'IDLE',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(IdleState)
+        .send({ type: 'NEW_NOTE', id });
+    });
+
+    it('moves to MODIFIED on UPDATE_NOTE', (done) => {
+      const id = random.uuid();
+      const note = { id, label: random.words() };
+      const context = {
+        notes: [note],
+      };
+      const IdleState = State.create({
+        value: 'IDLE',
+        context,
+      });
+      const updatedNote = {
+        ...note,
+        label: random.words(),
+      };
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(IdleState)
+        .send({ type: 'UPDATE_NOTE', note: updatedNote });
+    });
+
+    it('stays on IDLE on CHANGE_CURRENT', (done) => {
+      const oldId = random.uuid();
+      const newId = random.uuid();
+      const context = {
+        notes: [
+          { id: oldId, label: random.words() },
+          { id: newId, label: random.words() },
+        ],
+        currentId: oldId,
+      };
+      const IdleState = State.create({
+        value: 'IDLE',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('IDLE')) {
+            done();
+          }
+        })
+        .start(IdleState)
+        .send({ type: 'CHANGE_CURRENT', newId });
+    });
+  });
+
+  describe('MODIFIED state', () => {
+    it('moves to MODIFIED on NEW_NOTE', (done) => {
+      const context = {
+        notes: [],
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('NEW_NOTE');
+    });
+
+    it('moves to MODIFIED on REMOVE_NOTE', (done) => {
+      const id = random.uuid();
+      const context = {
+        notes: [{ id, label: random.words() }],
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send({ type: 'NEW_NOTE', id });
+    });
+
+    it('moves to MODIFIED on UPDATE_NOTE', (done) => {
+      const id = random.uuid();
+      const note = { id, label: random.words() };
+      const context = {
+        notes: [note],
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+      const updatedNote = {
+        ...note,
+        label: random.words(),
+      };
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send({ type: 'UPDATE_NOTE', note: updatedNote });
+    });
+
+    it('stays on MODIFIED on CHANGE_CURRENT', (done) => {
+      const oldId = random.uuid();
+      const newId = random.uuid();
+      const context = {
+        notes: [
+          { id: oldId, label: random.words() },
+          { id: newId, label: random.words() },
+        ],
+        currentId: oldId,
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send({ type: 'CHANGE_CURRENT', newId });
     });
   });
 });

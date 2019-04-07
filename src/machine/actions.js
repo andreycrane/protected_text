@@ -71,7 +71,7 @@ export function newNoteAction(ctx) {
 }
 
 
-export function removeNoteAction(ctx, { payload: { id } }) {
+export function removeNoteAction(ctx, { id }) {
   const { notes, currentId } = ctx;
   const removeNote = notes.find((n: TNote): boolean => n.id === id);
 
@@ -107,7 +107,7 @@ export function removeNoteAction(ctx, { payload: { id } }) {
   };
 }
 
-export function updateNoteAction(ctx, { payload: { note } }) {
+export function updateNoteAction(ctx, { note }) {
   const { notes } = ctx;
   const newNotes: TNotes = notes.map((n): TNote => {
     if (n.id === note.id) {
@@ -123,7 +123,7 @@ export function updateNoteAction(ctx, { payload: { note } }) {
   };
 }
 
-export function changeCurrentAction(ctx, { payload: { newId } }) {
+export function changeCurrentAction(ctx, { newId }) {
   const { notes, currentId } = ctx;
 
   if (currentId === newId) {
