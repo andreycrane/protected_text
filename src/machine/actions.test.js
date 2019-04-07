@@ -1,10 +1,17 @@
-import { helpers, random, lorem } from 'faker';
+import {
+  internet,
+  helpers,
+  random,
+  lorem,
+} from 'faker';
 
 import {
   newNoteAction,
   removeNoteAction,
   changeCurrentAction,
   updateNoteAction,
+  createEmptyAction,
+  createFromDecryptedAction,
 } from './actions';
 import { getPreferredNeighbor } from '../lib';
 
@@ -162,6 +169,61 @@ describe('machine#actions', () => {
       expect(newCtx.notes).toEqual(
         expect.arrayContaining([note]),
       );
+    });
+  });
+
+  describe('createEmptyAction', () => {
+    it('creates notes array and pushes default note', () => {
+      const oldCtx = { [random.objectElement()]: random.word() };
+
+      const newCtx = createEmptyAction(oldCtx, { type: 'CREATE_EMPTY' });
+
+      expect(newCtx).toMatchObject(oldCtx);
+      expect(newCtx).toHaveProperty('notes');
+      expect(newCtx.notes).toHaveLength(1);
+      expect(newCtx).toHaveProperty('currentId', newCtx.notes[0].id);
+    });
+  });
+
+  describe('createFromDecryptedAction', () => {
+    it('creates notes array from encrypted content', () => {
+      const oldCtx = { encrypted: random.words() };
+      const notes = [{ id: random.uuid(), label: random.word() }];
+      const password = internet.password();
+      const event = {
+        data: {
+          notes,
+          password,
+        },
+      };
+
+      const newCtx = createFromDecryptedAction(oldCtx, event);
+
+      expect(newCtx).toMatchObject(oldCtx);
+      expect(newCtx).toHaveProperty('notes');
+      expect(newCtx.notes).toHaveLength(notes.length);
+      expect(newCtx).toHaveProperty('currentId', newCtx.notes[0].id);
+      expect(newCtx).toHaveProperty('password', password);
+    });
+
+    it('creates notes array from empty encrypted content', () => {
+      const oldCtx = { encrypted: random.words() };
+      const notes = [];
+      const password = internet.password();
+      const event = {
+        data: {
+          notes,
+          password,
+        },
+      };
+
+      const newCtx = createFromDecryptedAction(oldCtx, event);
+
+      expect(newCtx).toMatchObject(oldCtx);
+      expect(newCtx).toHaveProperty('notes');
+      expect(newCtx.notes).toHaveLength(1);
+      expect(newCtx).toHaveProperty('currentId', newCtx.notes[0].id);
+      expect(newCtx).toHaveProperty('password', password);
     });
   });
 });

@@ -1,7 +1,10 @@
 import { interpret } from 'xstate';
-import machine from './machine';
+import { internet } from 'faker';
 
-describe('machine', () => {
+import machine from './machine';
+import { encrypt } from '../lib';
+
+describe.only('machine', () => {
   const states = {};
 
   it('moves from INITIAL state to ENCRYPTED state', (done) => {
@@ -12,7 +15,7 @@ describe('machine', () => {
 
     interpret(testMachine)
       .onTransition((state) => {
-        expect(state.value).toMatch('ENCRYPTED');
+        expect(state.value).toMatchObject({ ENCRYPTED: 'idle' });
         expect(state.context).toMatchObject(initialContext);
 
         states.ENCRYPTED = state;
@@ -41,15 +44,21 @@ describe('machine', () => {
   });
 
   it('moves from ENCRYPTED state to IDLE on DECRYPT', (done) => {
-    interpret(machine)
-      .start(states.ENCRYPTED)
+    jest.setTimeout(10000);
+    const password = internet.password();
+    const notes = [];
+    const ctx = {
+      encrypted: encrypt(notes, password),
+    };
+
+    interpret(machine.withContext(ctx))
       .onTransition((state) => {
         if (state.matches('IDLE')) {
-          expect(state.context).toMatchObject({ notes: [] });
           done();
         }
       })
-      .send({ type: 'DECRYPT', payload: { hello: 'world' } });
+      .start()
+      .send({ type: 'DECRYPT', password });
   });
 
   it('moves from FREE state to IDLE on CREATE_EMPTY', (done) => {
@@ -57,7 +66,8 @@ describe('machine', () => {
       .start(states.FREE)
       .onTransition((state) => {
         if (state.matches('IDLE')) {
-          expect(state.context).toMatchObject({ notes: [] });
+          expect(state.context).toHaveProperty('notes');
+          expect(state.context.notes).toHaveLength(1);
           done();
         }
       })

@@ -4,7 +4,7 @@ import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
 
 export type TSerializable = {
-  [string]: boolean | string | number | TSerializable,
+  [string]: boolean | string | number | TSerializable | $ReadOnlyArray<TSerializable>,
 };
 
 export function encrypt(data: TSerializable, password: string): string {

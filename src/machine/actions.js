@@ -10,19 +10,6 @@ import {
   getPreferredNeighbor,
 } from '../lib';
 
-export function decrypt(ctx) {
-  return ({
-    ...ctx,
-    notes: [],
-  });
-}
-
-export function createEmpty(ctx) {
-  return ({
-    ...ctx,
-    notes: [],
-  });
-}
 
 export function getNewNote(notes: TNotes): TNote {
   const newLabel = `Note ${notes.length + 1}`;
@@ -37,16 +24,52 @@ export function getNewNote(notes: TNotes): TNote {
   return newNote;
 }
 
+
+export function createEmptyAction(ctx) {
+  const newNote = getNewNote([]);
+
+  return ({
+    ...ctx,
+    notes: [newNote],
+    currentId: newNote.id,
+  });
+}
+
+
+export function createFromDecryptedAction(ctx, event) {
+  const { data } = event;
+  const { notes, password } = data;
+
+  if (Array.isArray(notes) === false || notes.length === 0) {
+    const newNote = getNewNote([]);
+    return ({
+      ...ctx,
+      notes: [newNote],
+      currentId: newNote.id,
+      password,
+    });
+  }
+
+  return ({
+    ...ctx,
+    notes,
+    currentId: notes[0].id,
+    password,
+  });
+}
+
+
 export function newNoteAction(ctx) {
   const { notes } = ctx;
   const newNote = getNewNote(notes);
 
-  return {
+  return ({
     ...ctx,
     currentId: newNote.id,
     notes: [...notes, newNote],
-  };
+  });
 }
+
 
 export function removeNoteAction(ctx, { payload: { id } }) {
   const { notes, currentId } = ctx;
@@ -118,6 +141,6 @@ export function changeCurrentAction(ctx, { payload: { newId } }) {
   };
 }
 
-export function close() {}
+export function closeAction() {}
 
-export function idleEntry() {}
+export function idleEntryAction() {}

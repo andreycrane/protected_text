@@ -1,12 +1,16 @@
 // @flow
 
-import { Machine, assign, send } from 'xstate'; // or use your own interpreter!
+import {
+  Machine,
+  assign,
+  send,
+} from 'xstate'; // or use your own interpreter!
 
 import {
-  decrypt,
-  createEmpty,
-  close,
-  idleEntry,
+  createFromDecryptedAction,
+  createEmptyAction,
+  closeAction,
+  idleEntryAction,
 } from './actions';
 
 import {
@@ -15,8 +19,15 @@ import {
   wasSiteDecrypted,
 } from './guards';
 
+import {
+  decryptService,
+  encryptService,
+} from './services';
+
 const machine = Machine(
   {
+    strict: true,
+    id: 'machine',
     initial: 'INITIAL',
     context: {
       encrypted: null,
@@ -32,16 +43,35 @@ const machine = Machine(
         },
       },
       ENCRYPTED: {
-        on: {
-          DECRYPT: {
-            actions: ['decrypt', send('GO_IDLE')],
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              DECRYPT: 'decrypting',
+            },
           },
-          CLOSE: {
-            actions: ['close'],
+          decrypting: {
+            invoke: {
+              src: 'decrypt',
+              onDone: {
+                target: 'success',
+                actions: 'createFromDecrypted',
+              },
+              onError: 'error',
+            },
           },
-          GO_IDLE: {
-            target: 'IDLE',
-            cond: 'wasSiteDecrypted',
+          error: {
+            on: {
+              DECRYPT: 'decrypting',
+            },
+          },
+          success: {
+            on: {
+              '': {
+                target: '#machine.IDLE',
+                cond: 'wasSiteDecrypted',
+              },
+            },
           },
         },
       },
@@ -56,23 +86,24 @@ const machine = Machine(
           },
         },
       },
-      IDLE: {
-        type: 'final',
-        onEntry: ['idleEntry'],
-      },
+      IDLE: {},
     },
   },
   {
     actions: {
-      decrypt: assign(decrypt),
-      createEmpty: assign(createEmpty),
-      close,
-      idleEntry,
+      createFromDecrypted: assign(createFromDecryptedAction),
+      createEmpty: assign(createEmptyAction),
+      close: closeAction,
+      idleEntry: idleEntryAction,
     },
     guards: {
       wasSiteCreated,
       wasSiteFree,
       wasSiteDecrypted,
+    },
+    services: {
+      encrypt: encryptService,
+      decrypt: decryptService,
     },
   },
 );

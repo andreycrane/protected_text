@@ -1,15 +1,10 @@
 // @flow
 
-export default function initContext(initialNotes) {
-  if (initialNotes.length === 0) {
-    return {
-      notes: [],
-      currentId: null,
-    };
-  }
+import { encrypt } from '../lib';
 
+export default function initContext() {
   return {
-    notes: initialNotes,
-    currentId: initialNotes[0].id,
+    encrypted: encrypt({ notes: [] }, 'test123'),
+    name: 'test_domain',
   };
 }
