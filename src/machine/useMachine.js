@@ -16,6 +16,7 @@ export default function useMachine(machine) {
     serviceRef.current = interpret(machine).onTransition(state => {
       // Update the current machine state when a transition occurs
       if (state.changed) {
+        console.log(state);
         setCurrent(state);
       }
     });

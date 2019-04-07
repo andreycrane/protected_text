@@ -1,29 +1,32 @@
 // @flow
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { Node } from 'react';
 
 import TabsLine from './TabsLine';
 import Editor from './Editor';
 
 export type TProps = $ReadOnly<{
-  notes: TNotes,
-  currentNote: TNote,
-  onNewNote: () => void,
-  onRemoveNote: (id: string) => void,
-  onUpdateNote: (note: TNote) => void,
-  onChangeCurrent: (newId: string) => void,
+  state: mixed,
+  send: () => void,
 }>;
 
 export function NotesAreaComponent(props: TProps): Node {
-  const {
-    notes,
-    currentNote,
-    onNewNote,
-    onUpdateNote,
-    onRemoveNote,
-    onChangeCurrent,
-  } = props;
+  const { state, send } = props;
+
+  const onNewNote = useCallback((): void => send('NEW_NOTE'));
+  const onRemoveNote = useCallback((id: string): void => send({ type: 'REMOVE_NOTE', id }));
+  const onChangeCurrent = useCallback((newId: string): void => send({ type: 'CHANGE_CURRENT', newId }));
+  const onUpdateNote = useCallback((note: TNote): void => send({ type: 'UPDATE_NOTE', note }));
+
+  if (Array.isArray(state.context.notes) === false) {
+    return (
+      <h2>{'There aren\'t any notes yet'}</h2>
+    );
+  }
+
+  const { notes, currentId } = state.context;
+  const currentNote = notes.find(n => n.id === currentId);
 
   return (
     <React.Fragment>

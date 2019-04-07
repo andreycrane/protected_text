@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { Node } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -9,9 +9,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
 
-export default function CreateNewDialog(): Node {
+
+export default function CreateNewDialog(props): Node {
+  const { state, send } = props;
+
+  const onCreateSite = useCallback((): void => send('CREATE_EMPTY'));
+
   return (
-    <Dialog open={false}>
+    <Dialog open={state.value === 'FREE'}>
       <DialogTitle>Create new site?</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -21,11 +26,14 @@ export default function CreateNewDialog(): Node {
           align="center"
           variant="h4"
         >
-          {'test'}
+          {state.context.name}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button color="primary">
+        <Button
+          color="primary"
+          onClick={onCreateSite}
+        >
           Create site
         </Button>
         <Button>

@@ -15,7 +15,8 @@ import {
   ChangePasswordDialog,
   CreatePasswordDialog,
 } from './Dialogs';
-import reducer, { initState } from './duck';
+
+import { useMachine } from '../machine';
 
 const styles = (): TStyles => ({
   container: {
@@ -39,19 +40,12 @@ const styles = (): TStyles => ({
 
 export type TProps = $ReadOnly<{
   classes: TStyles,
-  initialNotes: TNotes,
+  machine: mixed,
 }>;
 
 export function AppComponent(props: TProps): Node {
-  const { classes, initialNotes } = props;
-  const [state, dispatch] = useReducer(reducer, initialNotes, initState);
-
-  const currentNote = state.notes.find((n: TNote): boolean => n.id === state.currentId);
-
-  const onNewNote = useCallback((): void => dispatch({ type: 'NEW_NOTE' }));
-  const onRemoveNote = useCallback((id: string): void => dispatch({ type: 'REMOVE_NOTE', id }));
-  const onChangeCurrent = useCallback((newId: string): void => dispatch({ type: 'CHANGE_CURRENT', newId }));
-  const onUpdateNote = useCallback((note: TNote): void => dispatch({ type: 'UPDATE_NOTE', note }));
+  const { classes, machine } = props;
+  const [state, send] = useMachine(machine);
 
   return (
     <CssBaseline>
@@ -74,20 +68,17 @@ export function AppComponent(props: TProps): Node {
           xs={12}
           className={classes.tabs}
         >
-          {currentNote && (
-            <NotesArea
-              notes={state.notes}
-              currentNote={currentNote}
-              onNewNote={onNewNote}
-              onUpdateNote={onUpdateNote}
-              onRemoveNote={onRemoveNote}
-              onChangeCurrent={onChangeCurrent}
-            />
-          )}
+          <NotesArea
+            state={state}
+            send={send}
+          />
         </Grid>
       </Grid>
+      <CreateNewDialog
+        state={state}
+        send={send}
+      />
       <PasswordRequiredDialog />
-      <CreateNewDialog />
       <ChangePasswordDialog />
       <CreatePasswordDialog />
     </CssBaseline>
