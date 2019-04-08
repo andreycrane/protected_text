@@ -23,6 +23,8 @@ import {
   wasSiteCreated,
   wasSiteFree,
   wasSiteDecrypted,
+
+  hasPassword,
 } from './guards';
 
 import {
@@ -125,8 +127,14 @@ const machine = Machine(
           CHANGE_CURRENT: {
             actions: 'changeCurrent',
           },
+          SAVE: [
+            { target: 'SAVING', cond: 'hasPassword' },
+            { target: 'CREATE_PASSWORD' },
+          ],
         },
       },
+      CREATE_PASSWORD: {},
+      SAVING: {},
     },
   },
   {
@@ -146,6 +154,7 @@ const machine = Machine(
       wasSiteCreated,
       wasSiteFree,
       wasSiteDecrypted,
+      hasPassword,
     },
     services: {
       encrypt: encryptService,

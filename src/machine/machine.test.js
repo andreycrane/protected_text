@@ -316,5 +316,52 @@ describe('machine', () => {
         .start(ModifiedState)
         .send({ type: 'CHANGE_CURRENT', newId });
     });
+
+    it('moves to CREATE_PASSWORD on SAVE if password doesn\'t exist', (done) => {
+      const context = {
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('CREATE_PASSWORD')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('SAVE');
+    });
+
+    it('moves to SAVING on SAVE if password exists', (done) => {
+      const context = {
+        password: internet.password(),
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('SAVING')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('SAVE');
+    });
   });
 });

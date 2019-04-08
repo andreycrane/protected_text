@@ -11,3 +11,7 @@ export function wasSiteFree(ctx): boolean {
 export function wasSiteDecrypted(ctx): boolean {
   return Array.isArray(ctx.notes);
 }
+
+export function hasPassword(ctx): boolean {
+  return typeof ctx.password === 'string' && ctx.password.length > 0;
+}

@@ -1,7 +1,10 @@
+import { internet } from 'faker';
+
 import {
   wasSiteCreated,
   wasSiteFree,
   wasSiteDecrypted,
+  hasPassword,
 } from './guards';
 
 
@@ -51,6 +54,22 @@ describe('machine#guards', () => {
       const r = wasSiteCreated(ctx);
 
       expect(r).toBe(false);
+    });
+  });
+
+  describe('hasPassword', () => {
+    it('returns "true" if password exists', () => {
+      const ctx = { password: internet.password() };
+      const r = hasPassword(ctx);
+
+      expect(r).toBe(true);
+    });
+
+    it('returns "false" if password doesn\'t exist', () => {
+      const ctx = { password: internet.password() };
+      const r = hasPassword(ctx);
+
+      expect(r).toBe(true);
     });
   });
 });
