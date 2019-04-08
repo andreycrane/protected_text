@@ -131,10 +131,15 @@ const machine = Machine(
             { target: 'SAVING', cond: 'hasPassword' },
             { target: 'CREATE_PASSWORD' },
           ],
+          CHANGE_PASSWORD: {
+            target: 'CHANGE_PASSWORD',
+            cond: 'hasPassword',
+          },
         },
       },
-      CREATE_PASSWORD: {},
       SAVING: {},
+      CHANGE_PASSWORD: {},
+      CREATE_PASSWORD: {},
     },
   },
   {

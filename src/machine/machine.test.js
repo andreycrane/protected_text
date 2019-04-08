@@ -363,5 +363,29 @@ describe('machine', () => {
         .start(ModifiedState)
         .send('SAVE');
     });
+
+    it('moves to CHANGE_PASSWORD on CHANGE_PASSWORD if password exists', (done) => {
+      const context = {
+        password: internet.password(),
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('CHANGE_PASSWORD')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('CHANGE_PASSWORD');
+    });
   });
 });
