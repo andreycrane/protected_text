@@ -1,3 +1,4 @@
+import { random } from 'faker';
 import getPreferredNeighbor, { getNeighbors } from './neighbors';
 
 
@@ -15,6 +16,13 @@ describe('neighbors', () => {
         const r = getNeighbors(arr, c);
         expect(r).toEqual({ prev, next });
       });
+    });
+
+    it('returns empty neighbors if array doesn\'t include item', () => {
+      const arr = [1, 2, 3, 4, 5, 6];
+
+      const r = getNeighbors(arr, random.word());
+      expect(r).toEqual({ prev: null, next: null });
     });
   });
 
