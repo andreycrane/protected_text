@@ -25,6 +25,7 @@ import {
   wasSiteDecrypted,
 
   hasPassword,
+  canSetPassword,
 } from './guards';
 
 import {
@@ -139,7 +140,45 @@ const machine = Machine(
       },
       SAVING: {},
       CHANGE_PASSWORD: {},
-      CREATE_PASSWORD: {},
+      CREATE_PASSWORD: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              CREATE: [
+                {
+                  target: 'success',
+                  actions: assign({
+                    password: (ctx, { password }) => ({ ...ctx, password }),
+                  }),
+                  cond: 'canSetPassword',
+                },
+                {
+                  target: 'error',
+                },
+              ],
+              CANCEL: {
+                target: '#machine.MODIFIED',
+              },
+            },
+          },
+          error: {
+            on: {
+              CREATE: {
+                actions: 'setPassword',
+              },
+              CANCEL: {
+                target: '#machine.MODIFIED',
+              },
+            },
+          },
+          success: {
+            on: {
+              '': '#machine.SAVING',
+            },
+          },
+        },
+      },
     },
   },
   {
@@ -160,6 +199,7 @@ const machine = Machine(
       wasSiteFree,
       wasSiteDecrypted,
       hasPassword,
+      canSetPassword,
     },
     services: {
       encrypt: encryptService,

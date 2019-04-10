@@ -5,6 +5,7 @@ import {
   wasSiteFree,
   wasSiteDecrypted,
   hasPassword,
+  canSetPassword,
 } from './guards';
 
 
@@ -66,10 +67,26 @@ describe('machine#guards', () => {
     });
 
     it('returns "false" if password doesn\'t exist', () => {
-      const ctx = { password: internet.password() };
+      const ctx = { password: null };
       const r = hasPassword(ctx);
 
+      expect(r).toBe(false);
+    });
+  });
+
+  describe('canSetPassword', () => {
+    it('returns "true" if password exists in event object', () => {
+      const event = { password: internet.password() };
+      const r = canSetPassword({}, event);
+
       expect(r).toBe(true);
+    });
+
+    it('returns "false" if password doesn\'t exist event object', () => {
+      const event = { password: null };
+      const r = canSetPassword({}, event);
+
+      expect(r).toBe(false);
     });
   });
 });

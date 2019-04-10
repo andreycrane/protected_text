@@ -15,3 +15,7 @@ export function wasSiteDecrypted(ctx): boolean {
 export function hasPassword(ctx): boolean {
   return typeof ctx.password === 'string' && ctx.password.length > 0;
 }
+
+export function canSetPassword(ctx, { password }): boolean {
+  return typeof password === 'string' && password.length > 0;
+}

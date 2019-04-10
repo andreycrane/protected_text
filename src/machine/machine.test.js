@@ -388,4 +388,102 @@ describe('machine', () => {
         .send('CHANGE_PASSWORD');
     });
   });
+
+  describe('CREATE_PASSWORD state', () => {
+    it('moves to MODIFIED on CANCEL', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: { CREATE_PASSWORD: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('CANCEL');
+    });
+
+    it('moves to SAVING on CREATE if password exists', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: { CREATE_PASSWORD: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('SAVING')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send({ type: 'CREATE', password: internet.password() });
+    });
+
+    it('moves to { CREATE_PASSWORD: error } on CREATE if password doesn\'t exist', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: { CREATE_PASSWORD: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches({ CREATE_PASSWORD: 'error' })) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send({ type: 'CREATE', password: null });
+    });
+
+    it('moves from { CREATE_PASSWORD: error } to MODIFIED on DONE', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ModifiedState = State.create({
+        value: { CREATE_PASSWORD: 'error' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('CANCEL');
+    });
+  });
 });
