@@ -141,6 +141,13 @@ export function changeCurrentAction(ctx, { newId }) {
   };
 }
 
+export function setPasswordAction(ctx, { password }) {
+  return ({
+    ...ctx,
+    password,
+  });
+}
+
 export function closeAction() {}
 
 export function idleEntryAction() {}

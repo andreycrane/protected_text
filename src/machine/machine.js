@@ -17,6 +17,8 @@ import {
   updateNoteAction,
 
   changeCurrentAction,
+
+  setPasswordAction,
 } from './actions';
 
 import {
@@ -139,7 +141,32 @@ const machine = Machine(
         },
       },
       SAVING: {},
-      CHANGE_PASSWORD: {},
+      CHANGE_PASSWORD: {
+        initial: 'idle',
+        states: {
+          idle: {
+            on: {
+              CREATE: [
+                {
+                  target: 'success',
+                  actions: 'setPassword',
+                  cond: 'canSetPassword',
+                },
+                {
+                  target: 'error',
+                },
+              ],
+              CANCEL: {
+                target: '#machine.MODIFIED',
+              },
+            },
+          },
+          error: {
+          },
+          success: {
+          },
+        },
+      },
       CREATE_PASSWORD: {
         initial: 'idle',
         states: {
@@ -148,9 +175,7 @@ const machine = Machine(
               CREATE: [
                 {
                   target: 'success',
-                  actions: assign({
-                    password: (ctx, { password }) => ({ ...ctx, password }),
-                  }),
+                  actions: 'setPassword',
                   cond: 'canSetPassword',
                 },
                 {
@@ -165,7 +190,9 @@ const machine = Machine(
           error: {
             on: {
               CREATE: {
+                target: 'success',
                 actions: 'setPassword',
+                cond: 'canSetPassword',
               },
               CANCEL: {
                 target: '#machine.MODIFIED',
@@ -193,6 +220,7 @@ const machine = Machine(
       updateNote: assign(updateNoteAction),
 
       changeCurrent: assign(changeCurrentAction),
+      setPassword: assign(setPasswordAction),
     },
     guards: {
       wasSiteCreated,

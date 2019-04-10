@@ -12,6 +12,7 @@ import {
   updateNoteAction,
   createEmptyAction,
   createFromDecryptedAction,
+  setPasswordAction,
 } from './actions';
 import { getPreferredNeighbor } from '../lib';
 
@@ -222,6 +223,24 @@ describe('machine#actions', () => {
       expect(newCtx).toHaveProperty('notes');
       expect(newCtx.notes).toHaveLength(1);
       expect(newCtx).toHaveProperty('currentId', newCtx.notes[0].id);
+      expect(newCtx).toHaveProperty('password', password);
+    });
+  });
+
+  describe('setPassword', () => {
+    it('sets password', () => {
+      const oldCtx = {
+        encrypted: random.words(),
+        notes: [
+          { id: random.uuid(), label: random.word() },
+        ],
+      };
+      const password = internet.password();
+      const event = { password };
+
+      const newCtx = setPasswordAction(oldCtx, event);
+
+      expect(newCtx).toMatchObject(oldCtx);
       expect(newCtx).toHaveProperty('password', password);
     });
   });
