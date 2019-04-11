@@ -148,7 +148,7 @@ const machine = Machine(
             on: {
               CREATE: [
                 {
-                  target: 'success',
+                  target: '#machine.MODIFIED',
                   actions: 'setPassword',
                   cond: 'canSetPassword',
                 },
@@ -162,8 +162,6 @@ const machine = Machine(
             },
           },
           error: {
-          },
-          success: {
           },
         },
       },

@@ -399,7 +399,7 @@ describe('machine', () => {
         ],
         currentId: random.uuid(),
       };
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'idle' },
         context,
       });
@@ -410,7 +410,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send('CANCEL');
     });
 
@@ -423,7 +423,7 @@ describe('machine', () => {
         ],
         currentId: random.uuid(),
       };
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'idle' },
         context,
       });
@@ -434,7 +434,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send({ type: 'CREATE', password: internet.password() });
     });
 
@@ -447,7 +447,7 @@ describe('machine', () => {
         ],
         currentId: random.uuid(),
       };
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'idle' },
         context,
       });
@@ -458,7 +458,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send({ type: 'CREATE', password: null });
     });
 
@@ -471,7 +471,7 @@ describe('machine', () => {
         ],
         currentId: random.uuid(),
       };
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'error' },
         context,
       });
@@ -482,7 +482,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send('CANCEL');
     });
 
@@ -496,7 +496,7 @@ describe('machine', () => {
         currentId: random.uuid(),
       };
       const password = internet.password();
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'error' },
         context,
       });
@@ -507,7 +507,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send({ type: 'CREATE', password });
     });
 
@@ -520,7 +520,7 @@ describe('machine', () => {
         ],
         currentId: random.uuid(),
       };
-      const ModifiedState = State.create({
+      const CreatePassword = State.create({
         value: { CREATE_PASSWORD: 'error' },
         context,
       });
@@ -531,8 +531,58 @@ describe('machine', () => {
             done();
           }
         })
-        .start(ModifiedState)
+        .start(CreatePassword)
         .send({ type: 'CREATE' });
+    });
+  });
+
+  describe('CHANGE_PASSWORD state', () => {
+    it('moves to MODIFIED on CREATE if password exists', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ChangePassword = State.create({
+        value: { CHANGE_PASSWORD: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(ChangePassword)
+        .send({ type: 'CREATE', password: internet.password() });
+    });
+
+    it('moves to { CHANGE_PASSWORD: error } on CREATE if password doesn\'t exist', (done) => {
+      const context = {
+        password: null,
+        notes: [
+          { id: random.uuid(), label: random.words() },
+          { id: random.uuid(), label: random.words() },
+        ],
+        currentId: random.uuid(),
+      };
+      const ChangePassword = State.create({
+        value: { CHANGE_PASSWORD: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches({ CHANGE_PASSWORD: 'error' })) {
+            done();
+          }
+        })
+        .start(ChangePassword)
+        .send({ type: 'CREATE', password: null });
     });
   });
 });
