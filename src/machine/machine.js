@@ -162,6 +162,16 @@ const machine = Machine(
             },
           },
           error: {
+            on: {
+              CREATE: {
+                target: '#machine.MODIFIED',
+                actions: 'setPassword',
+                cond: 'canSetPassword',
+              },
+              CANCEL: {
+                target: '#machine.MODIFIED',
+              },
+            },
           },
         },
       },
