@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import type { Node } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -14,10 +14,44 @@ export type TProps = $ReadOnly<{
   open: boolean,
   title: string,
   text: string,
+  onSave: (password: string) => void,
+  onCancel: () => void,
 }>;
 
 export default function BasePasswordDialog(props: TProps): Node {
-  const { title, text, open } = props;
+  const {
+    title,
+    text,
+    open,
+    onSave,
+    onCancel,
+  } = props;
+
+  const [state, setState] = useState({
+    password: '',
+    repeatedPassword: '',
+  });
+
+  const onPasswordChange = useCallback(
+    (e) => {
+      const { value } = e.target;
+      setState(prev => ({ ...prev, password: value }));
+    },
+    [setState],
+  );
+
+  const onRepeatedPasswordChange = useCallback(
+    (e) => {
+      const { value } = e.target;
+
+      setState(prev => ({ ...prev, repeatedPassword: value }));
+    },
+    [setState],
+  );
+
+  function onSaveClick() {
+    console.log('here', state);
+  }
 
   return (
     <Dialog open={open}>
@@ -33,6 +67,8 @@ export default function BasePasswordDialog(props: TProps): Node {
           label="Password"
           type="password"
           fullWidth
+          value={state.password}
+          onChange={onPasswordChange}
         />
         <TextField
           margin="dense"
@@ -40,13 +76,20 @@ export default function BasePasswordDialog(props: TProps): Node {
           label="Repeat password"
           type="password"
           fullWidth
+          value={state.repeatedPassword}
+          onChange={onRepeatedPasswordChange}
         />
       </DialogContent>
       <DialogActions>
-        <Button color="primary">
+        <Button
+          color="primary"
+          onClick={onSaveClick}
+        >
           Save
         </Button>
-        <Button>
+        <Button
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </DialogActions>

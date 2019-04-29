@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { Node } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -8,8 +8,19 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+export type TProps = $ReadOnly<{
+  state: mixed,
+  send: (args: mixed) => void,
+}>;
 
-export function TopBarComponent(): Node {
+export function TopBarComponent(props: TProps): Node {
+  const { state, send } = props;
+
+  const onSaveCallback = useCallback(
+    (): void => send('SAVE'),
+    [send],
+  );
+
   return (
     <AppBar position="relative">
       <Toolbar>
@@ -33,10 +44,13 @@ export function TopBarComponent(): Node {
               spacing={8}
             >
               <Grid item>
-                <Button variant="contained">Reload</Button>
-              </Grid>
-              <Grid item>
-                <Button variant="contained">Save</Button>
+                <Button
+                  variant="contained"
+                  disabled={!state.matches('MODIFIED')}
+                  onClick={onSaveCallback}
+                >
+                    Save
+                </Button>
               </Grid>
               <Grid item>
                 <Button variant="contained">Change password</Button>
@@ -52,4 +66,4 @@ export function TopBarComponent(): Node {
   );
 }
 
-export default React.memo<{}>(TopBarComponent);
+export default React.memo<TProps>(TopBarComponent);

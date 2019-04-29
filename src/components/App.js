@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useReducer, useCallback } from 'react';
+import React from 'react';
 import type { Node } from 'react';
 
 import Grid from '@material-ui/core/Grid';
@@ -61,7 +61,10 @@ export function AppComponent(props: TProps): Node {
           xs={12}
           className={classes.appbar}
         >
-          <TopBar />
+          <TopBar
+            state={state}
+            send={send}
+          />
         </Grid>
         <Grid
           item
@@ -80,7 +83,10 @@ export function AppComponent(props: TProps): Node {
       />
       <PasswordRequiredDialog />
       <ChangePasswordDialog />
-      <CreatePasswordDialog />
+      <CreatePasswordDialog
+        state={state}
+        send={send}
+      />
     </CssBaseline>
   );
 }
