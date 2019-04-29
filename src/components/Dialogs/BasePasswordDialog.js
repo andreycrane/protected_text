@@ -43,14 +43,17 @@ export default function BasePasswordDialog(props: TProps): Node {
   const onRepeatedPasswordChange = useCallback(
     (e) => {
       const { value } = e.target;
-
       setState(prev => ({ ...prev, repeatedPassword: value }));
     },
     [setState],
   );
 
   function onSaveClick() {
-    console.log('here', state);
+    const { password, repeatedPassword } = state;
+
+    if (password === repeatedPassword) {
+      onSave(password);
+    }
   }
 
   return (

@@ -15,8 +15,13 @@ export type TProps = $ReadOnly<{
 export default function CreatePasswordDialog(props: TProps): Node {
   const { state, send } = props;
 
-  const onCreate = useCallback(
-    () => send({ type: 'CREATE' }),
+  const onSave = useCallback(
+    (password: string): void => send({ type: 'CREATE', password }),
+    [send],
+  );
+
+  const onCancel = useCallback(
+    (): void => send('CANCEL'),
     [send],
   );
 
@@ -25,6 +30,8 @@ export default function CreatePasswordDialog(props: TProps): Node {
       open={state.matches('CREATE_PASSWORD')}
       title="Create password"
       text="Longer passwords are more secure."
+      onSave={onSave}
+      onCancel={onCancel}
     />
   );
 }
