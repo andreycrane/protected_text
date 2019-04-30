@@ -8,6 +8,8 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+import { hasPassword } from '../machine/guards';
+
 export type TProps = $ReadOnly<{
   state: mixed,
   send: (args: mixed) => void,
@@ -16,8 +18,13 @@ export type TProps = $ReadOnly<{
 export function TopBarComponent(props: TProps): Node {
   const { state, send } = props;
 
-  const onSaveCallback = useCallback(
+  const onSave = useCallback(
     (): void => send('SAVE'),
+    [send],
+  );
+
+  const onChangePassword = useCallback(
+    (): void => send('CHANGE_PASSWORD'),
     [send],
   );
 
@@ -47,16 +54,19 @@ export function TopBarComponent(props: TProps): Node {
                 <Button
                   variant="contained"
                   disabled={!state.matches('MODIFIED')}
-                  onClick={onSaveCallback}
+                  onClick={onSave}
                 >
                     Save
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Change password</Button>
-              </Grid>
-              <Grid item>
-                <Button variant="contained">Delete</Button>
+                <Button
+                  variant="contained"
+                  disabled={!hasPassword(state.context)}
+                  onClick={onChangePassword}
+                >
+                  Change password
+                </Button>
               </Grid>
             </Grid>
           </Grid>

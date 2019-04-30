@@ -82,7 +82,10 @@ export function AppComponent(props: TProps): Node {
         send={send}
       />
       <PasswordRequiredDialog />
-      <ChangePasswordDialog />
+      <ChangePasswordDialog
+        state={state}
+        send={send}
+      />
       <CreatePasswordDialog
         state={state}
         send={send}

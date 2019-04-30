@@ -114,6 +114,10 @@ const machine = Machine(
           CHANGE_CURRENT: {
             actions: 'changeCurrent',
           },
+          CHANGE_PASSWORD: {
+            target: 'CHANGE_PASSWORD',
+            cond: 'hasPassword',
+          },
         },
       },
       MODIFIED: {
@@ -140,7 +144,14 @@ const machine = Machine(
           },
         },
       },
-      SAVING: {},
+      SAVING: {
+        invoke: {
+          id: 'encrypt',
+          src: 'encrypt',
+          onDone: '#machine.IDLE',
+          onError: '#machine.IDLE',
+        },
+      },
       CHANGE_PASSWORD: {
         initial: 'idle',
         states: {
@@ -163,11 +174,16 @@ const machine = Machine(
           },
           error: {
             on: {
-              CREATE: {
-                target: '#machine.MODIFIED',
-                actions: 'setPassword',
-                cond: 'canSetPassword',
-              },
+              CREATE: [
+                {
+                  target: '#machine.MODIFIED',
+                  actions: 'setPassword',
+                  cond: 'canSetPassword',
+                },
+                {
+                  target: 'error',
+                },
+              ],
               CANCEL: {
                 target: '#machine.MODIFIED',
               },
@@ -197,11 +213,16 @@ const machine = Machine(
           },
           error: {
             on: {
-              CREATE: {
-                target: 'success',
-                actions: 'setPassword',
-                cond: 'canSetPassword',
-              },
+              CREATE: [
+                {
+                  target: 'success',
+                  actions: 'setPassword',
+                  cond: 'canSetPassword',
+                },
+                {
+                  target: 'error',
+                },
+              ],
               CANCEL: {
                 target: '#machine.MODIFIED',
               },
