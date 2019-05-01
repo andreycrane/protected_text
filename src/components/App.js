@@ -33,8 +33,14 @@ const styles = (): TStyles => ({
     alignSelf: 'stretch',
   },
   tabs: {
-    flexGrow: '1 1 auto',
+    flex: '1 1 auto',
     alignSelf: 'stretch',
+    display: 'flex',
+    flexDirection: 'column',
+    flexWrap: 'nowrap',
+    justifyContent: 'flex-start',
+    alignContent: 'stretch',
+    alignItems: 'stretch',
   },
 });
 

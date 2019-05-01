@@ -7,7 +7,18 @@ import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
 import AccessAlarmIcon from '@material-ui/icons/AddCircle';
 import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@material-ui/core/styles';
+
 import TabLabel from './TabLabel';
+
+
+const styles = (): TStyles => ({
+  tabLine: {
+    order: '0',
+    flex: '0 1 auto',
+    alignSelf: 'auto',
+  },
+});
 
 export type TProps = $ReadOnly<{
   notes: TNotes,
@@ -15,6 +26,7 @@ export type TProps = $ReadOnly<{
   onNewNote: () => void,
   onRemoveNote: (id: string) => void,
   onChangeCurrent: (newId: string) => void,
+  classes: TStyles,
 }>;
 
 export function TabsLineComponent(props: TProps): Node {
@@ -24,6 +36,7 @@ export function TabsLineComponent(props: TProps): Node {
     onNewNote,
     onChangeCurrent,
     onRemoveNote,
+    classes,
   } = props;
 
   const handleChangeCurrent = useCallback(
@@ -51,6 +64,7 @@ export function TabsLineComponent(props: TProps): Node {
       textColor="primary"
       variant="scrollable"
       scrollButtons="auto"
+      className={classes.tabLine}
     >
       {notes.map(({ id, label }): Node => (
         <Tab
@@ -92,4 +106,4 @@ export function TabsLineComponent(props: TProps): Node {
   );
 }
 
-export default React.memo<TProps>(TabsLineComponent);
+export default withStyles(styles)(TabsLineComponent);

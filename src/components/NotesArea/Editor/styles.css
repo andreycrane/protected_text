@@ -6,9 +6,7 @@
   align-items: stretch;
   justify-content: flex-start;
 
-  width: 100%;
-  height: 100%;
-
+  flex: 1 1 auto;
   padding: 5px;
 }
 
@@ -24,15 +22,22 @@
   order: 0;
   flex: 0 1 auto;
   align-self: auto;
-
-  padding: 3px 0;
 }
 
+.note-editor-block-styles {
+  padding-top: 5px;
+}
+
+.note-editor-inline-styles {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #999;
+}
 
 .DraftEditor-root {
   order: 0;
   flex: 1 1 auto;
   align-self: auto;
+  margin-top: 10px;
 }
 
 .note-editor-style-button {
@@ -40,9 +45,16 @@
   flex: 0 1 auto;
   align-self: auto;
 
+  border: 0;
   margin: 0 3px;
+  color: #999;
+  background: transparent;
+  cursor: pointer;
+  margin-right: 16px;
+  padding: 2px 0;
+  outline: none;
 }
 
 .note-editor-style-button-active {
-  color: red;
+  color: #5890ff;
 }
