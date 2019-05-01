@@ -7,9 +7,15 @@ import {
   EditorState,
   convertToRaw,
   convertFromRaw,
+  RichUtils,
 } from 'draft-js';
 
 import type { RawDraftContentState } from 'draft-js/lib/RawDraftContentState';
+
+import InlineStyleConrtols from './InlineStyleControls';
+import BlockStyleConrtols from './BlockStyleControls';
+
+import './styles.css';
 
 function getEditorState(note: TNote): EditorState {
   const contentState = convertFromRaw(note.rawContent);
@@ -58,10 +64,48 @@ export default function NoteEditor(props: TProps): Node {
     });
   }
 
+  function toggleBlockType(blockType) {
+    onEditorChange(
+      RichUtils.toggleBlockType(
+        state.editorState,
+        blockType,
+      ),
+    );
+  }
+
+  function toggleInlineStyle(inlineStyle) {
+    onEditorChange(
+      RichUtils.toggleInlineStyle(
+        state.editorState,
+        inlineStyle,
+      ),
+    );
+  }
+
+  function handleKeyCommand(command, editorState) {
+    const newState = RichUtils.handleKeyCommand(editorState, command);
+    if (newState) {
+      onEditorChange(newState);
+      return 'handled';
+    }
+    return 'not-handled';
+  }
+
   return (
-    <Editor
-      editorState={state.editorState}
-      onChange={onEditorChange}
-    />
+    <div className="note-editor">
+      <BlockStyleConrtols
+        editorState={state.editorState}
+        onToggle={toggleBlockType}
+      />
+      <InlineStyleConrtols
+        editorState={state.editorState}
+        onToggle={toggleInlineStyle}
+      />
+      <Editor
+        editorState={state.editorState}
+        onChange={onEditorChange}
+        handleKeyCommand={handleKeyCommand}
+      />
+    </div>
   );
 }
