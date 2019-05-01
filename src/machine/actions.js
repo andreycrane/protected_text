@@ -103,7 +103,7 @@ export function removeNoteAction(ctx: TContext, event: TEvent): TContext {
   }
 
   if (notes.length === 1) {
-    const newNote = getNewNote(notes);
+    const newNote = getNewNote(null);
 
     return {
       ...ctx,

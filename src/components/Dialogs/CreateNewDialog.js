@@ -7,6 +7,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 
@@ -22,12 +23,12 @@ export default function CreateNewDialog(props): Node {
         <DialogContentText>
           {'Great! This site doesn\'t exist, it can be yours! Would you like to create:'}
         </DialogContentText>
-        <DialogContentText
+        <Typography
           align="center"
-          variant="h4"
+          variant="h6"
         >
           {state.context.name}
-        </DialogContentText>
+        </Typography>
       </DialogContent>
       <DialogActions>
         <Button
