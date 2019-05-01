@@ -8,14 +8,14 @@ import {
 import {
   genId,
   getPreferredNeighbor,
+  isObject,
 } from '../lib';
 
-
-export function getNewNote(notes: TNotes): TNote {
-  const newLabel = `Note ${notes.length + 1}`;
+export function getNewNote(notes: null | TNotes): TNote {
+  const newLabel = Array.isArray(notes) ? `Note ${notes.length + 1}` : 'Note 1';
   const newNote = {
     id: genId(),
-    label: `Note ${notes.length + 1}`,
+    label: newLabel,
     rawContent: convertToRaw(
       ContentState.createFromText(newLabel),
     ),
@@ -25,7 +25,7 @@ export function getNewNote(notes: TNotes): TNote {
 }
 
 
-export function createEmptyAction(ctx) {
+export function createEmptyAction(ctx: TContext): TContext {
   const newNote = getNewNote([]);
 
   return ({
@@ -36,9 +36,15 @@ export function createEmptyAction(ctx) {
 }
 
 
-export function createFromDecryptedAction(ctx, event) {
+export function createFromDecryptedAction(ctx: TContext, event: TEvent): TContext {
   const { data } = event;
-  const { notes, password } = data;
+
+  if (!isObject(data) || typeof data.password !== 'string') {
+    throw new Error('invalid params in event object');
+  }
+
+  // eslint-disable-next-line flowtype/no-weak-types
+  const { notes, password } = (data: Object);
 
   if (Array.isArray(notes) === false || notes.length === 0) {
     const newNote = getNewNote([]);
@@ -59,19 +65,36 @@ export function createFromDecryptedAction(ctx, event) {
 }
 
 
-export function newNoteAction(ctx) {
+export function newNoteAction(ctx: TContext): TContext {
   const { notes } = ctx;
   const newNote = getNewNote(notes);
+
+  if (Array.isArray(notes)) {
+    return ({
+      ...ctx,
+      currentId: newNote.id,
+      notes: [...notes, newNote],
+    });
+  }
 
   return ({
     ...ctx,
     currentId: newNote.id,
-    notes: [...notes, newNote],
+    notes: [newNote],
   });
 }
 
 
-export function removeNoteAction(ctx, { id }) {
+export function removeNoteAction(ctx: TContext, event: TEvent): TContext {
+  if (typeof event.id !== 'string') {
+    throw new Error('invalid event params');
+  }
+
+  if (!Array.isArray(ctx.notes)) {
+    throw new Error('invalid context');
+  }
+
+  const { id } = event;
   const { notes, currentId } = ctx;
   const removeNote = notes.find((n: TNote): boolean => n.id === id);
 
@@ -107,8 +130,18 @@ export function removeNoteAction(ctx, { id }) {
   };
 }
 
-export function updateNoteAction(ctx, { note }) {
+export function updateNoteAction(ctx: TContext, event: TEvent): TContext {
+  if (!isObject(event.note)) {
+    throw new Error('invalid event params');
+  }
+
+  if (!Array.isArray(ctx.notes)) {
+    throw new Error('invalid context');
+  }
+
+  const { note } = event;
   const { notes } = ctx;
+
   const newNotes: TNotes = notes.map((n): TNote => {
     if (n.id === note.id) {
       return note;
@@ -123,7 +156,16 @@ export function updateNoteAction(ctx, { note }) {
   };
 }
 
-export function changeCurrentAction(ctx, { newId }) {
+export function changeCurrentAction(ctx: TContext, event: TEvent): TContext {
+  if (typeof event.newId !== 'string') {
+    throw new Error('invalid event params');
+  }
+
+  if (!Array.isArray(ctx.notes) || typeof ctx.currentId !== 'string') {
+    throw new Error('invalid context');
+  }
+
+  const { newId } = event;
   const { notes, currentId } = ctx;
 
   if (currentId === newId) {
@@ -135,16 +177,20 @@ export function changeCurrentAction(ctx, { newId }) {
     return ctx;
   }
 
-  return {
-    ...ctx,
-    currentId: newId,
-  };
-}
-
-export function setPasswordAction(ctx, { password }) {
   return ({
     ...ctx,
-    password,
+    currentId: newId,
+  });
+}
+
+export function setPasswordAction(ctx: TContext, event: TEvent): TContext {
+  if (typeof event.password !== 'string') {
+    throw new Error('invalid event params');
+  }
+
+  return ({
+    ...ctx,
+    password: event.password,
   });
 }
 

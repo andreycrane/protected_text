@@ -107,6 +107,7 @@ describe('machine#actions', () => {
     it('returns same context if newId equal currentId', () => {
       const newId = random.uuid();
       const oldCtx = {
+        notes: [],
         currentId: newId,
       };
       const newCtx = changeCurrentAction(oldCtx, { type: 'CHANGE_CURRENT', newId });

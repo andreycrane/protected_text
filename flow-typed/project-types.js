@@ -14,13 +14,20 @@ declare type TStyles = $ReadOnly<{
   [string]: string | TStyles,
 }>;
 
-export type TState = $ReadOnly<{
-  notes: TNotes,
+
+declare type TContext = $ReadOnly<{
+  name: string,
+  encrypted: string | null,
   currentId: string | null,
+  password: string | null,
+  notes: TNotes | null,
 }>;
 
-export type TAction =
-  $ReadOnly<{ type: 'NEW_NOTE' }> |
-  $ReadOnly<{ type: 'UPDATE_NOTE', note: TNote }> |
-  $ReadOnly<{ type: 'REMOVE_NOTE', id: string }> |
-  $ReadOnly<{ type: 'CHANGE_CURRENT', newId: string }>;
+declare type TPlain = $ReadOnly<{
+  [string]: string | number | boolean | TNote | TPlain,
+}>;
+
+declare type TEvent = $ReadOnly<{
+  type: string,
+  ...TPlain,
+}>;
