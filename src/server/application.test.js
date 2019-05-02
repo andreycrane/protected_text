@@ -30,7 +30,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data: null },
+        [null, { id, data: null }],
         done,
       );
   });
@@ -48,7 +48,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
   });
 
@@ -64,7 +64,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
   });
 
@@ -80,7 +80,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
 
     return request(this.app)
@@ -88,7 +88,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
   });
 
@@ -104,7 +104,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
 
     await request(this.app)
@@ -112,7 +112,7 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data },
+        [null, { id, data }],
       );
 
     await request(this.app)
@@ -120,7 +120,15 @@ describe('server#application', function () {
       .expect('Content-Type', /json/)
       .expect(
         200,
-        { id, data: null },
+        [null, { id, data: null }],
+      );
+  });
+
+  it('returns 404 if accepts unrecognized url', async () => {
+    await request(this.app)
+      .get('/id/lol/test')
+      .expect(
+        404,
       );
   });
 });
