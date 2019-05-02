@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "server:development": "webpack-dev-server --color --progress",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest -c jest.config.js",
+    "test:watch": "npm run test -- --watch",
+    "test:client": "jest -c jest.client.config.js",
+    "test:server": "jest -c jest.server.config.js",
+    "test:client:watch": "npm run test:client -- --watch",
+    "test:server:watch": "npm run test:server -- --watch"
   },
   "author": "Andrey Zhuravlyov",
   "license": "ISC",
@@ -44,6 +48,7 @@
     "@material-ui/icons": "^3.0.2",
     "crypto-js": "^3.1.9-1",
     "draft-js": "^0.10.5",
+    "express": "^4.16.4",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "xstate": "^4.4.0"
