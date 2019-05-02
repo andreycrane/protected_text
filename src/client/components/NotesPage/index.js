@@ -16,7 +16,7 @@ import {
   CreatePasswordDialog,
 } from './Dialogs';
 
-import { useMachine } from '../machine';
+import { useMachine } from '../../machine';
 
 const styles = (): TStyles => ({
   container: {
