@@ -46,7 +46,7 @@ const machine = Machine(
     strict: true,
     id: 'machine',
     initial: 'INITIAL',
-    context: initContext(null, 'site_name'),
+    context: initContext('site_name'),
     states: {
       INITIAL: {
         initial: 'get_site',
@@ -56,7 +56,7 @@ const machine = Machine(
               src: 'getSite',
               onDone: {
                 target: 'success',
-                actions: assign((ctx, event): TContext => ({ ...ctx, encrypted: event.data.data })),
+                actions: assign((ctx, event): TContext => ({ ...ctx, ...event.data })),
               },
               onError: 'error',
             },

@@ -16,7 +16,7 @@ declare type TStyles = $ReadOnly<{
 
 
 declare type TContext = $ReadOnly<{
-  name: string,
+  id: string,
   encrypted: string | null,
   currentId: string | null,
   password: string | null,

@@ -26,7 +26,7 @@ if (document.body && rootDiv) {
           path="/:name(\S+)"
           render={(): Node => (
             <NotesPage
-              machine={machine.withContext(initContext(null, 'site_name'))}
+              machine={machine.withContext(initContext('site_name'))}
             />
           )}
         />

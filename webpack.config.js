@@ -30,6 +30,9 @@ module.exports = {
   devServer: {
     contentBase: './dist',
     historyApiFallback: true,
+    proxy: {
+      '/api/*': 'http://localhost:3000',
+    },
   },
   plugins: [
     new CleanWebpackPlugin(),

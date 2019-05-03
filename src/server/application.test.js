@@ -26,101 +26,93 @@ describe('server#application', function () {
   it('returns data=null if key doesn\'t exist', (done) => {
     const id = random.uuid();
     request(this.app)
-      .get(`/id/${id}`)
+      .get(`/api/id/${id}`)
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data: null }],
+        [null, { id, encrypted: null }],
         done,
       );
   });
 
   it('returns data=\'data\' if key exists', async () => {
     const id = random.uuid();
-    const data = {
-      [random.objectElement()]: random.uuid(),
-    };
+    const encrypted = random.uuid();
 
-    this.db.set(id, data);
+    this.db.set(id, encrypted);
 
     return request(this.app)
-      .get(`/id/${id}`)
+      .get(`/api/id/${id}`)
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
   });
 
   it('stores data by certain key', async () => {
     const id = random.uuid();
-    const data = {
-      [random.objectElement()]: random.uuid(),
-    };
+    const encrypted = random.uuid();
 
     return request(this.app)
-      .post(`/id/${id}`)
-      .send(data)
+      .post(`/api/id/${id}`)
+      .send({ encrypted })
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
   });
 
   it('returns recently saved data', async () => {
     const id = random.uuid();
-    const data = {
-      [random.objectElement()]: random.uuid(),
-    };
+    const encrypted = random.uuid();
 
     await request(this.app)
-      .post(`/id/${id}`)
-      .send(data)
+      .post(`/api/id/${id}`)
+      .send({ encrypted })
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
 
     return request(this.app)
-      .get(`/id/${id}`)
+      .get(`/api/id/${id}`)
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
   });
 
   it('removes recently stored data', async () => {
     const id = random.uuid();
-    const data = {
-      [random.objectElement()]: random.uuid(),
-    };
+    const encrypted = random.uuid();
 
     await request(this.app)
-      .post(`/id/${id}`)
-      .send(data)
+      .post(`/api/id/${id}`)
+      .send({ encrypted })
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
 
     await request(this.app)
-      .get(`/id/${id}`)
+      .get(`/api/id/${id}`)
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data }],
+        [null, { id, encrypted }],
       );
 
     await request(this.app)
-      .delete(`/id/${id}`)
+      .delete(`/api/id/${id}`)
       .expect('Content-Type', /json/)
       .expect(
         200,
-        [null, { id, data: null }],
+        [null, { id, encrypted: null }],
       );
   });
 

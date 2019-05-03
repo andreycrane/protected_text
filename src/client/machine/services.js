@@ -2,14 +2,51 @@
 
 import { encrypt, decrypt } from '../lib';
 
-export async function getSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
-  return { something: 'something' };
+export async function getSiteService(ctx: TContext): Promise<TContext> {
+  const { id } = ctx;
+  const res = await fetch(
+    `/api/id/${id}`,
+  );
+
+  const [error, data] = await res.json();
+
+  if (error) {
+    throw error;
+  }
+
+  return ({
+    ...ctx,
+    ...data,
+  });
 }
 
-export async function postSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
+export async function postSiteService(ctx: TContext): Promise<TContext> {
+  const { id, encrypted } = ctx;
+
+  const res = await fetch(
+    `/api/id/${id}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ encrypted }),
+    },
+  );
+
+  await res.json();
+
+  return ctx;
 }
 
-export async function deleteSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
+export async function deleteSiteService(ctx: TContext): Promise<TContext> {
+  const { id } = ctx;
+
+  const res = await fetch(`/api/id/${id}`, { method: 'DELETE' });
+
+  await res.json();
+
+  return ctx;
 }
 
 export async function decryptService(ctx: TContext, event: TEvent): Promise<TContext> {

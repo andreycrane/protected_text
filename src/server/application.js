@@ -10,42 +10,42 @@ module.exports = config => {
 
   app.use(bodyParser.json());
 
-  app.get('/id/:id', async (req, res) => {
+  app.get('/api/id/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      const data = await db.get(id);
+      const encrypted = await db.get(id);
 
-      if (!data) {
-        res.json([null, { id, data: null }]);
+      if (!encrypted) {
+        res.json([null, { id, encrypted: null }]);
         return;
       }
 
-      res.json([null, { id, data }]);
+      res.json([null, { id, encrypted }]);
     } catch (error) {
       res.json([error, null]);
     }
   });
 
-  app.post('/id/:id', async (req, res) => {
+  app.post('/api/id/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      const { body } = req;
+      const { encrypted } = req.body;
 
-      await db.set(id, body);
+      await db.set(id, encrypted);
 
-      res.json([null, { id, data: body }]);
+      res.json([null, { id, encrypted }]);
     } catch (error) {
       res.json([error, null]);
     }
   });
 
-  app.delete('/id/:id', async (req, res) => {
+  app.delete('/api/id/:id', async (req, res) => {
     try {
       const { id } = req.params;
 
       await db.delete(id);
 
-      res.json([null, { id, data: null }]);
+      res.json([null, { id, encrypted: null }]);
     } catch (error) {
       res.json([error, null]);
     }

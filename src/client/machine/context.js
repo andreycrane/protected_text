@@ -1,10 +1,11 @@
 // @flow
 
-export default function initContext(encrypted: string | null, name: string): TContext {
+export default function initContext(id: string): TContext {
   return {
-    encrypted,
-    name,
+    id,
+    encrypted: null,
     password: null,
     notes: null,
+    currentId: null,
   };
 }
