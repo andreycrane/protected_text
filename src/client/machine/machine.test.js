@@ -5,11 +5,15 @@ import { encrypt } from '../lib';
 
 import machine from './machine';
 import initContext from './context';
-import { getSiteService } from './services';
+import {
+  getSiteService,
+  postSiteService,
+} from './services';
 
 jest.mock('./services', () => {
   const t = jest.requireActual('./services');
   t.getSiteService = jest.fn(async () => null);
+  t.postSiteService = jest.fn(async () => null);
 
   return t;
 });
@@ -17,7 +21,7 @@ jest.mock('./services', () => {
 describe('machine', () => {
   describe('INITIAL state', () => {
     it('moves to get_site children state', (done) => {
-      const initialContext = initContext(null, 'site_name');
+      const initialContext = initContext('site_name');
       const testMachine = machine.withContext(initialContext);
 
       interpret(testMachine)
@@ -30,13 +34,13 @@ describe('machine', () => {
         .start();
     });
 
-    it('move to ENCRYPTED:idle if service resolves with encrypted data', (done) => {
+    it('moves to ENCRYPTED:idle if service resolves with encrypted data', (done) => {
       const id = random.uuid();
-      const data = random.words();
-      const initialContext = initContext(null, id);
+      const encrypted = random.words();
+      const initialContext = initContext(id);
       const testMachine = machine.withContext(initialContext);
 
-      getSiteService.mockImplementation(async () => ({ id, data }));
+      getSiteService.mockImplementation(async () => ({ id, encrypted }));
 
       interpret(testMachine)
         .onTransition((state) => {
@@ -49,7 +53,7 @@ describe('machine', () => {
 
     it('move to FREE if service resolves without encrypted data', (done) => {
       const id = random.uuid();
-      const initialContext = initContext(null, id);
+      const initialContext = initContext(id);
       const testMachine = machine.withContext(initialContext);
 
       getSiteService.mockImplementation(async () => ({ id, data: null }));
@@ -65,7 +69,7 @@ describe('machine', () => {
 
     it('move to INITIAL:error if service rejected', (done) => {
       const id = random.uuid();
-      const initialContext = initContext(null, id);
+      const initialContext = initContext(id);
       const testMachine = machine.withContext(initialContext);
 
       getSiteService.mockImplementation(async () => {
@@ -85,7 +89,7 @@ describe('machine', () => {
 
   describe('FREE state', () => {
     it('moves from FREE state to IDLE on CREATE_EMPTY', (done) => {
-      const context = initContext(null, 'site_name');
+      const context = initContext('site_name');
       const FreeState = State.create({
         value: 'FREE',
         context,
@@ -108,7 +112,7 @@ describe('machine', () => {
     it('moves to IDLE on DECRYPT if password is right', (done) => {
       const password = internet.password();
       const notes = [];
-      const context = initContext(encrypt(notes, password), 'site_name');
+      const context = initContext('site_name', encrypt(notes, password));
       const EncryptedIdleState = State.create({
         value: { ENCRYPTED: 'idle' },
         context,
@@ -127,7 +131,7 @@ describe('machine', () => {
     it('moves to ENCRYPTED.error on DECRYPT if password is wrong', (done) => {
       const password = internet.password();
       const notes = [];
-      const context = initContext(encrypt(notes, password), 'site_name');
+      const context = initContext('site_name', encrypt(notes, password));
       const EncryptedIdleState = State.create({
         value: { ENCRYPTED: 'idle' },
         context,
@@ -146,7 +150,7 @@ describe('machine', () => {
     it('moves from ENCRYPTED.error to IDLE on DECRYPT if password is right', (done) => {
       const password = internet.password();
       const notes = [];
-      const context = initContext(encrypt(notes, password), 'site_name');
+      const context = initContext('site_name', encrypt(notes, password));
       const EncryptedErrorState = State.create({
         value: { ENCRYPTED: 'error' },
         context,
@@ -165,7 +169,7 @@ describe('machine', () => {
     it('moves from ENCRYPTED.error to ENCRYPTED.error on DECRYPT if password is wrong', (done) => {
       const password = internet.password();
       const notes = [];
-      const context = initContext(encrypt(notes, password), 'site_name');
+      const context = initContext('site_name', encrypt(notes, password));
       const EncryptedErrorState = State.create({
         value: { ENCRYPTED: 'error' },
         context,

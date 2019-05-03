@@ -34,9 +34,7 @@ import {
   getSiteService,
   postSiteService,
   deleteSiteService,
-
   decryptService,
-  encryptService,
 } from './services';
 
 import initContext from './context';
@@ -165,8 +163,8 @@ const machine = Machine(
       },
       SAVING: {
         invoke: {
-          id: 'encrypt',
-          src: 'encrypt',
+          id: 'saving',
+          src: 'postSite',
           onDone: '#machine.IDLE',
           onError: '#machine.IDLE',
         },
@@ -282,7 +280,6 @@ const machine = Machine(
       postSite: postSiteService,
       deleteSite: deleteSiteService,
 
-      encrypt: encryptService,
       decrypt: decryptService,
     },
   },

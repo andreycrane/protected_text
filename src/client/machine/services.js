@@ -21,7 +21,13 @@ export async function getSiteService(ctx: TContext): Promise<TContext> {
 }
 
 export async function postSiteService(ctx: TContext): Promise<TContext> {
-  const { id, encrypted } = ctx;
+  const {
+    id,
+    notes,
+    password,
+  } = ctx;
+
+  const encrypted = encrypt(notes, password);
 
   const res = await fetch(
     `/api/id/${id}`,
@@ -34,7 +40,11 @@ export async function postSiteService(ctx: TContext): Promise<TContext> {
     },
   );
 
-  await res.json();
+  const [error] = await res.json();
+
+  if (error) {
+    throw error;
+  }
 
   return ctx;
 }
@@ -59,16 +69,5 @@ export async function decryptService(ctx: TContext, event: TEvent): Promise<TCon
     ...ctx,
     notes,
     password,
-  });
-}
-
-export async function encryptService(ctx: TContext): Promise<TContext> {
-  const { notes, password } = ctx;
-
-  const encrypted = encrypt(notes, password);
-
-  return ({
-    ...ctx,
-    encrypted,
   });
 }
