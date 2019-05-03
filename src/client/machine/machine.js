@@ -31,6 +31,10 @@ import {
 } from './guards';
 
 import {
+  getSiteService,
+  postSiteService,
+  deleteSiteService,
+
   decryptService,
   encryptService,
 } from './services';
@@ -45,12 +49,27 @@ const machine = Machine(
     context: initContext(null, 'site_name'),
     states: {
       INITIAL: {
-        on: {
-          // Transient transitions
-          '': [
-            { target: 'ENCRYPTED', cond: 'wasSiteCreated' },
-            { target: 'FREE', cond: 'wasSiteFree' },
-          ],
+        initial: 'get_site',
+        states: {
+          get_site: {
+            invoke: {
+              src: 'getSite',
+              onDone: {
+                target: 'success',
+                actions: assign((ctx, event): TContext => ({ ...ctx, encrypted: event.data.data })),
+              },
+              onError: 'error',
+            },
+          },
+          success: {
+            on: {
+              '': [
+                { target: '#machine.ENCRYPTED', cond: 'wasSiteCreated' },
+                { target: '#machine.FREE', cond: 'wasSiteFree' },
+              ],
+            },
+          },
+          error: {},
         },
       },
       ENCRYPTED: {
@@ -259,6 +278,10 @@ const machine = Machine(
       canSetPassword,
     },
     services: {
+      getSite: getSiteService,
+      postSite: postSiteService,
+      deleteSite: deleteSiteService,
+
       encrypt: encryptService,
       decrypt: decryptService,
     },

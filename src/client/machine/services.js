@@ -2,6 +2,16 @@
 
 import { encrypt, decrypt } from '../lib';
 
+export async function getSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
+  return { something: 'something' };
+}
+
+export async function postSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
+}
+
+export async function deleteSiteService(ctx: TContext, event: TEvent): Promise<TContext> {
+}
+
 export async function decryptService(ctx: TContext, event: TEvent): Promise<TContext> {
   const { password } = event;
   const { encrypted } = ctx;

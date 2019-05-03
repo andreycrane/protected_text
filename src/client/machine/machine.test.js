@@ -5,16 +5,24 @@ import { encrypt } from '../lib';
 
 import machine from './machine';
 import initContext from './context';
+import { getSiteService } from './services';
+
+jest.mock('./services', () => {
+  const t = jest.requireActual('./services');
+  t.getSiteService = jest.fn(async () => null);
+
+  return t;
+});
 
 describe('machine', () => {
   describe('INITIAL state', () => {
-    it('moves from INITIAL state to ENCRYPTED state', (done) => {
-      const initialContext = initContext('enrypted_data', 'site_name');
+    it('moves to get_site children state', (done) => {
+      const initialContext = initContext(null, 'site_name');
       const testMachine = machine.withContext(initialContext);
 
       interpret(testMachine)
         .onTransition((state) => {
-          if (state.matches({ ENCRYPTED: 'idle' })) {
+          if (state.matches({ INITIAL: 'get_site' })) {
             expect(state.context).toMatchObject(initialContext);
             done();
           }
@@ -22,13 +30,51 @@ describe('machine', () => {
         .start();
     });
 
-    it('moves from INITIAL state to FREE state', (done) => {
-      const initialContext = initContext(null, 'site_name');
+    it('move to ENCRYPTED:idle if service resolves with encrypted data', (done) => {
+      const id = random.uuid();
+      const data = random.words();
+      const initialContext = initContext(null, id);
       const testMachine = machine.withContext(initialContext);
+
+      getSiteService.mockImplementation(async () => ({ id, data }));
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches({ ENCRYPTED: 'idle' })) {
+            done();
+          }
+        })
+        .start();
+    });
+
+    it('move to FREE if service resolves without encrypted data', (done) => {
+      const id = random.uuid();
+      const initialContext = initContext(null, id);
+      const testMachine = machine.withContext(initialContext);
+
+      getSiteService.mockImplementation(async () => ({ id, data: null }));
 
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches('FREE')) {
+            done();
+          }
+        })
+        .start();
+    });
+
+    it('move to INITIAL:error if service rejected', (done) => {
+      const id = random.uuid();
+      const initialContext = initContext(null, id);
+      const testMachine = machine.withContext(initialContext);
+
+      getSiteService.mockImplementation(async () => {
+        throw new Error();
+      });
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches({ INITIAL: 'error' })) {
             expect(state.context).toMatchObject(initialContext);
             done();
           }

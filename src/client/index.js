@@ -1,6 +1,7 @@
 // @flow
 
 import React from 'react';
+import type { Node } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
@@ -23,13 +24,11 @@ if (document.body && rootDiv) {
         <Route path="/" exact component={MainPage} />
         <Route
           path="/:name(\S+)"
-          render={
-            () => (
-              <NotesPage
-                machine={machine.withContext(initContext(null, 'site_name'))}
-              />
-            )
-          }
+          render={(): Node => (
+            <NotesPage
+              machine={machine.withContext(initContext(null, 'site_name'))}
+            />
+          )}
         />
       </BrowserRouter>
     ),
