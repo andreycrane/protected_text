@@ -1,8 +1,7 @@
 // @flow
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { Node } from 'react';
-
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -11,6 +10,8 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
+import { withRouter } from 'react-router-dom';
+import type { RouterHistory } from 'react-router-dom';
 
 const styles = (): TStyles => ({
   container: {
@@ -39,11 +40,24 @@ const styles = (): TStyles => ({
 
 export type TProps = $ReadOnly<{
   classes: TStyles,
+  history: RouterHistory,
 }>;
 
 
 export function MainPageComponent(props: TProps): Node {
-  const { classes } = props;
+  const { classes, history } = props;
+
+  const [siteName, setSiteName] = useState('');
+
+  function onChangeName(e) {
+    const { value } = e.target;
+
+    setSiteName(value);
+  }
+
+  function onGoClick() {
+    history.push(`/${siteName}`);
+  }
 
   return (
     <div className={classes.container}>
@@ -69,6 +83,8 @@ export function MainPageComponent(props: TProps): Node {
               label="Site name"
               margin="normal"
               fullWidth
+              onChange={onChangeName}
+              value={siteName}
             />
             <Button
               type="button"
@@ -76,6 +92,7 @@ export function MainPageComponent(props: TProps): Node {
               variant="contained"
               size="large"
               color="primary"
+              onClick={onGoClick}
             >
               Go
             </Button>
@@ -86,4 +103,4 @@ export function MainPageComponent(props: TProps): Node {
   );
 }
 
-export default withStyles(styles)(MainPageComponent);
+export default withRouter(withStyles(styles)(MainPageComponent));
