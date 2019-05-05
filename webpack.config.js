@@ -1,6 +1,7 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const createApp = require('./src/server/application');
 
 module.exports = {
   mode: 'development',
@@ -30,8 +31,15 @@ module.exports = {
   devServer: {
     contentBase: './dist',
     historyApiFallback: true,
-    proxy: {
-      '/api/*': 'http://localhost:3000',
+    before(app) {
+      const { app: serverApp } = createApp(
+        {
+          connectionParams: [
+            { store: new Map() },
+          ],
+        },
+      );
+      app.use(serverApp);
     },
   },
   plugins: [
