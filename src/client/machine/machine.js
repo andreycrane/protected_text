@@ -170,11 +170,22 @@ const machine = Machine(
         },
       },
       SAVING: {
-        invoke: {
-          id: 'saving',
-          src: 'postSite',
-          onDone: '#machine.IDLE',
-          onError: '#machine.IDLE',
+        initial: 'saving',
+        states: {
+          saving: {
+            invoke: {
+              id: 'saving',
+              src: 'postSite',
+              onDone: '#machine.IDLE',
+              onError: 'error',
+            },
+          },
+          error: {
+            on: {
+              REPEAT: 'saving',
+              CANCEL: '#machine.MODIFIED',
+            },
+          },
         },
       },
       CHANGE_PASSWORD: {

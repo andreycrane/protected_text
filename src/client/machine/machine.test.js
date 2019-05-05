@@ -5,7 +5,10 @@ import { encrypt } from '../lib';
 
 import machine from './machine';
 import initContext from './context';
-import { getSiteService } from './services';
+import {
+  getSiteService,
+  postSiteService,
+} from './services';
 
 jest.mock('./services', () => {
   const t = jest.requireActual('./services');
@@ -17,7 +20,7 @@ jest.mock('./services', () => {
 
 describe('machine', () => {
   describe('INITIAL state', () => {
-    it('moves to get_site children state', (done) => {
+    it('moves to INITIAL:get_site children state', (done) => {
       const initialContext = initContext('site_name');
       const testMachine = machine.withContext(initialContext);
 
@@ -790,6 +793,97 @@ describe('machine', () => {
           }
         })
         .start(ChangePassword)
+        .send('CANCEL');
+    });
+  });
+
+  describe('SAVING state', () => {
+    it('moves to SAVING:saving children state', (done) => {
+      const context = initContext('site_name');
+      const testMachine = machine.withContext(context);
+      const SavingState = State.create({
+        value: 'SAVING',
+        context,
+      });
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches({ SAVING: 'saving' })) {
+            done();
+          }
+        })
+        .start(SavingState);
+    });
+
+    it('moves to IDLE if service resolves', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const testMachine = machine.withContext(context);
+      testMachine.initial = 'SAVING';
+
+      postSiteService.mockImplementation(async () => true);
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches('IDLE')) {
+            done();
+          }
+        })
+        .start();
+    });
+
+    it('moves to SAVING.error if service rejects', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const testMachine = machine.withContext(context);
+      testMachine.initial = 'SAVING';
+
+      postSiteService.mockImplementation(async () => { throw new Error(); });
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches({ SAVING: 'error' })) {
+            done();
+          }
+        })
+        .start();
+    });
+
+    it('moves from SAVING.error to SAVING.saving on REPEAT', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const testMachine = machine.withContext(context);
+      const SavingState = State.create({
+        value: { SAVING: 'error' },
+        context,
+      });
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches({ SAVING: 'saving' })) {
+            done();
+          }
+        })
+        .start(SavingState)
+        .send('REPEAT');
+    });
+
+    it('moves from SAVING.error to MODIFIED on CANCEL', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const testMachine = machine.withContext(context);
+      const SavingState = State.create({
+        value: { SAVING: 'error' },
+        context,
+      });
+
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(SavingState)
         .send('CANCEL');
     });
   });
