@@ -67,7 +67,12 @@ const machine = Machine(
               ],
             },
           },
-          error: {},
+          error: {
+            on: {
+              REPEAT: 'get_site',
+              CANCEL: '#machine.EXIT',
+            },
+          },
         },
       },
       ENCRYPTED: {
@@ -92,6 +97,7 @@ const machine = Machine(
           error: {
             on: {
               DECRYPT: 'decrypting',
+              CANCEL: '#machine.EXIT',
             },
           },
           success: {
@@ -113,6 +119,7 @@ const machine = Machine(
             target: 'IDLE',
             cond: 'wasSiteDecrypted',
           },
+          CANCEL: '#machine.EXIT',
         },
       },
       IDLE: {
@@ -224,9 +231,7 @@ const machine = Machine(
                   target: 'error',
                 },
               ],
-              CANCEL: {
-                target: '#machine.MODIFIED',
-              },
+              CANCEL: '#machine.MODIFIED',
             },
           },
           error: {
@@ -241,9 +246,7 @@ const machine = Machine(
                   target: 'error',
                 },
               ],
-              CANCEL: {
-                target: '#machine.MODIFIED',
-              },
+              CANCEL: '#machine.MODIFIED',
             },
           },
           success: {

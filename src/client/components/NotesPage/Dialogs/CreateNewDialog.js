@@ -10,14 +10,21 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
+export type TProps = $ReadOnly<{
+  state: mixed,
+  send: (args: mixed) => void,
+}>;
 
-export default function CreateNewDialog(props): Node {
+export default function CreateNewDialog(props: TProps): Node {
   const { state, send } = props;
 
   const onCreateSite = useCallback((): void => send('CREATE_EMPTY'));
+  function onCancel() {
+    send('CANCEL');
+  }
 
   return (
-    <Dialog open={state.value === 'FREE'}>
+    <Dialog open={state.matches('FREE')}>
       <DialogTitle>Create new site?</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -27,7 +34,7 @@ export default function CreateNewDialog(props): Node {
           align="center"
           variant="h6"
         >
-          {state.context.name}
+          {state.context.id}
         </Typography>
       </DialogContent>
       <DialogActions>
@@ -37,7 +44,9 @@ export default function CreateNewDialog(props): Node {
         >
           Create site
         </Button>
-        <Button>
+        <Button
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </DialogActions>

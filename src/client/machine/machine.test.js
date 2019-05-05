@@ -5,10 +5,7 @@ import { encrypt } from '../lib';
 
 import machine from './machine';
 import initContext from './context';
-import {
-  getSiteService,
-  postSiteService,
-} from './services';
+import { getSiteService } from './services';
 
 jest.mock('./services', () => {
   const t = jest.requireActual('./services');
@@ -67,7 +64,7 @@ describe('machine', () => {
         .start();
     });
 
-    it('move to INITIAL:error if service rejected', (done) => {
+    it('moves to INITIAL:error if service rejected', (done) => {
       const id = random.uuid();
       const initialContext = initContext(id);
       const testMachine = machine.withContext(initialContext);
@@ -85,10 +82,44 @@ describe('machine', () => {
         })
         .start();
     });
+
+    it('moves from INITIAL.error to INITIAL:get_site on REPEAT', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const InitialState = State.create({
+        value: { INITIAL: 'error' },
+        context,
+      });
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches({ INITIAL: 'get_site' })) {
+            done();
+          }
+        })
+        .start(InitialState)
+        .send('REPEAT');
+    });
+
+    it('moves from INITIAL.error to EXIT on CANCEL', (done) => {
+      const id = random.uuid();
+      const context = initContext(id);
+      const InitialState = State.create({
+        value: { INITIAL: 'error' },
+        context,
+      });
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('EXIT')) {
+            done();
+          }
+        })
+        .start(InitialState)
+        .send('CANCEL');
+    });
   });
 
   describe('FREE state', () => {
-    it('moves from FREE state to IDLE on CREATE_EMPTY', (done) => {
+    it('moves to IDLE on CREATE_EMPTY', (done) => {
       const context = initContext('site_name');
       const FreeState = State.create({
         value: 'FREE',
@@ -105,6 +136,23 @@ describe('machine', () => {
         })
         .start(FreeState)
         .send('CREATE_EMPTY');
+    });
+
+    it('moves to EXIT on CANCEL', (done) => {
+      const context = initContext('site_name');
+      const FreeState = State.create({
+        value: 'FREE',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('EXIT')) {
+            done();
+          }
+        })
+        .start(FreeState)
+        .send('CANCEL');
     });
   });
 
@@ -147,6 +195,25 @@ describe('machine', () => {
         .send({ type: 'DECRYPT', password: internet.password() });
     });
 
+    it('moves to EXIT on CANCEL', (done) => {
+      const password = internet.password();
+      const notes = [];
+      const context = initContext('site_name', encrypt(notes, password));
+      const EncryptedIdleState = State.create({
+        value: { ENCRYPTED: 'idle' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('EXIT')) {
+            done();
+          }
+        })
+        .start(EncryptedIdleState)
+        .send('CANCEL');
+    });
+
     it('moves from ENCRYPTED.error to IDLE on DECRYPT if password is right', (done) => {
       const password = internet.password();
       const notes = [];
@@ -183,6 +250,25 @@ describe('machine', () => {
         })
         .start(EncryptedErrorState)
         .send({ type: 'DECRYPT', password: internet.password() });
+    });
+
+    it('moves from ENCRYPTED.error to EXIT on CANCEL', (done) => {
+      const password = internet.password();
+      const notes = [];
+      const context = initContext('site_name', encrypt(notes, password));
+      const EncryptedErrorState = State.create({
+        value: { ENCRYPTED: 'error' },
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('EXIT')) {
+            done();
+          }
+        })
+        .start(EncryptedErrorState)
+        .send('CANCEL');
     });
   });
 
