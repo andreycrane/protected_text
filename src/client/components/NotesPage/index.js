@@ -1,11 +1,13 @@
 // @flow
 
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
 import type { Node } from 'react';
-
+import type { Match, RouterHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
+import { useMachine } from '@xstate/react';
+import machine, { initContext } from '../../machine';
 
 import NotesArea from './NotesArea';
 import TopBar from './TopBar';
@@ -16,7 +18,6 @@ import {
   CreatePasswordDialog,
 } from './Dialogs';
 
-import { useMachine } from '../../machine';
 
 const styles = (): TStyles => ({
   container: {
@@ -46,12 +47,29 @@ const styles = (): TStyles => ({
 
 export type TProps = $ReadOnly<{
   classes: TStyles,
-  machine: mixed,
+  match: Match,
+  history: RouterHistory,
 }>;
 
 export function AppComponent(props: TProps): Node {
-  const { classes, machine } = props;
-  const [state, send] = useMachine(machine);
+  const { classes, match, history } = props;
+  const { params } = match;
+
+  const appMachine = useMemo(
+    () => machine.withContext(initContext(params.name)),
+    [params.name],
+  );
+
+  const [state, send, service] = useMachine(appMachine);
+
+  useEffect(
+    () => {
+      service.onDone(() => {
+        history.push('/');
+      });
+    },
+    [service],
+  );
 
   return (
     <CssBaseline>

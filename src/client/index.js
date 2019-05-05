@@ -1,14 +1,11 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import NotesPage from './components/NotesPage';
 import MainPage from './components/MainPage';
-
-import machine, { initContext } from './machine';
 
 import './styles/index.css';
 
@@ -21,15 +18,10 @@ if (document.body && rootDiv) {
   render(
     (
       <BrowserRouter>
-        <Route path="/" exact component={MainPage} />
-        <Route
-          path="/:name(\S+)"
-          render={(): Node => (
-            <NotesPage
-              machine={machine.withContext(initContext('site_name'))}
-            />
-          )}
-        />
+        <Switch>
+          <Route path="/" exact component={MainPage} />
+          <Route path="/:name(\S+)" component={NotesPage} />
+        </Switch>
       </BrowserRouter>
     ),
     rootDiv,

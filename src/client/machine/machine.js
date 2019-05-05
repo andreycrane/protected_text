@@ -76,6 +76,7 @@ const machine = Machine(
           idle: {
             on: {
               DECRYPT: 'decrypting',
+              CANCEL: '#machine.EXIT',
             },
           },
           decrypting: {
@@ -252,6 +253,9 @@ const machine = Machine(
           },
         },
       },
+      EXIT: {
+        type: 'final',
+      },
     },
   },
   {
@@ -279,7 +283,6 @@ const machine = Machine(
       getSite: getSiteService,
       postSite: postSiteService,
       deleteSite: deleteSiteService,
-
       decrypt: decryptService,
     },
   },

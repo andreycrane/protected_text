@@ -31,6 +31,10 @@ export default function PasswordRequiredDialog(props: TProps): Node {
     send({ type: 'DECRYPT', password });
   }
 
+  function onCancel() {
+    send('CANCEL');
+  }
+
   return (
     <Dialog open={state.matches('ENCRYPTED')}>
       <DialogTitle>Password required</DialogTitle>
@@ -57,7 +61,9 @@ export default function PasswordRequiredDialog(props: TProps): Node {
         >
           Decrypt
         </Button>
-        <Button>
+        <Button
+          onClick={onCancel}
+        >
           Cancel
         </Button>
       </DialogActions>
