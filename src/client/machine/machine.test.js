@@ -368,6 +368,97 @@ describe('machine', () => {
     });
   });
 
+  describe('SAVED state', () => {
+    it('moves to MODIFIED on NEW_NOTE', (done) => {
+      const context = {
+        notes: [],
+      };
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send('NEW_NOTE');
+    });
+
+    it('moves to MODIFIED on REMOVE_NOTE', (done) => {
+      const id = random.uuid();
+      const context = {
+        notes: [{ id, label: random.words() }],
+      };
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send({ type: 'NEW_NOTE', id });
+    });
+
+    it('moves to MODIFIED on UPDATE_NOTE', (done) => {
+      const id = random.uuid();
+      const note = { id, label: random.words() };
+      const context = {
+        notes: [note],
+      };
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+      const updatedNote = {
+        ...note,
+        label: random.words(),
+      };
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('MODIFIED')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send({ type: 'UPDATE_NOTE', note: updatedNote });
+    });
+
+    it('stays on SAVED on CHANGE_CURRENT', (done) => {
+      const oldId = random.uuid();
+      const newId = random.uuid();
+      const context = {
+        notes: [
+          { id: oldId, label: random.words() },
+          { id: newId, label: random.words() },
+        ],
+        currentId: oldId,
+      };
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches('SAVED')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send({ type: 'CHANGE_CURRENT', newId });
+    });
+  });
+
   describe('MODIFIED state', () => {
     it('moves to MODIFIED on NEW_NOTE', (done) => {
       const context = {
