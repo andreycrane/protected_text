@@ -23,7 +23,7 @@ describe('server#application', function () {
     await this.db.clear();
   });
 
-  it('returns data=null if key doesn\'t exist', (done) => {
+  it('returns encrypted=null if key doesn\'t exist', (done) => {
     const id = random.uuid();
     request(this.app)
       .get(`/api/id/${id}`)
@@ -35,7 +35,7 @@ describe('server#application', function () {
       );
   });
 
-  it('returns data=\'data\' if key exists', async () => {
+  it('returns encrypted=\'data\' if key exists', async () => {
     const id = random.uuid();
     const encrypted = random.uuid();
 
