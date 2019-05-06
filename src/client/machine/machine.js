@@ -143,6 +143,7 @@ const machine = Machine(
             target: 'CHANGE_PASSWORD',
             cond: 'hasPassword',
           },
+          DELETE: '#machine.DELETING',
         },
       },
       NEW: {
@@ -184,6 +185,7 @@ const machine = Machine(
             target: 'CHANGE_PASSWORD',
             cond: 'hasPassword',
           },
+          DELETE: '#machine.DELETING',
         },
       },
       SAVING: {

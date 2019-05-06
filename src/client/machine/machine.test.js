@@ -522,6 +522,22 @@ describe('machine', () => {
         .send({ type: 'UPDATE_NOTE', note: updatedNote });
     });
 
+    it('moves to DELETING on DELETE', (done) => {
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('DELETING')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send('DELETE');
+    });
+
     it('stays on SAVED on CHANGE_CURRENT', (done) => {
       const SavedState = State.create({
         value: 'SAVED',
@@ -698,6 +714,27 @@ describe('machine', () => {
         })
         .start(ModifiedState)
         .send('CHANGE_PASSWORD');
+    });
+
+    it('moves to DELETING on DELETE', (done) => {
+      const id = random.uuid();
+      const note = { id, label: random.words() };
+      const context = {
+        notes: [note],
+      };
+      const ModifiedState = State.create({
+        value: 'MODIFIED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('DELETING')) {
+            done();
+          }
+        })
+        .start(ModifiedState)
+        .send('DELETE');
     });
   });
 
