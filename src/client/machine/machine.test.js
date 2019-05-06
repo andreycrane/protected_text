@@ -124,7 +124,7 @@ describe('machine', () => {
   });
 
   describe('FREE state', () => {
-    it('moves to IDLE on CREATE_EMPTY', (done) => {
+    it('moves to NEW on CREATE_EMPTY', (done) => {
       const context = initContext('site_name');
       const FreeState = State.create({
         value: 'FREE',
@@ -133,7 +133,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('IDLE')) {
+          if (state.matches('NEW')) {
             expect(state.context).toHaveProperty('notes');
             expect(state.context.notes).toHaveLength(1);
             done();
@@ -162,7 +162,7 @@ describe('machine', () => {
   });
 
   describe('ENCRYPTED state', () => {
-    it('moves to IDLE on DECRYPT if password is right', (done) => {
+    it('moves to SAVED on DECRYPT if password is right', (done) => {
       const password = internet.password();
       const notes = [];
       const context = initContext('site_name', encrypt(notes, password));
@@ -173,7 +173,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('IDLE')) {
+          if (state.matches('SAVED')) {
             done();
           }
         })
@@ -219,7 +219,7 @@ describe('machine', () => {
         .send('CANCEL');
     });
 
-    it('moves from ENCRYPTED.error to IDLE on DECRYPT if password is right', (done) => {
+    it('moves from ENCRYPTED.error to SAVED on DECRYPT if password is right', (done) => {
       const password = internet.password();
       const notes = [];
       const context = initContext('site_name', encrypt(notes, password));
@@ -230,7 +230,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('IDLE')) {
+          if (state.matches('SAVED')) {
             done();
           }
         })
@@ -277,13 +277,13 @@ describe('machine', () => {
     });
   });
 
-  describe('IDLE state', () => {
-    it('moves to MODIFIED on NEW_NOTE', (done) => {
+  describe('NEW state', () => {
+    it('moves to MODIFIED on NEW', (done) => {
       const context = {
         notes: [],
       };
-      const IdleState = State.create({
-        value: 'IDLE',
+      const NewState = State.create({
+        value: 'NEW',
         context,
       });
 
@@ -293,7 +293,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(IdleState)
+        .start(NewState)
         .send('NEW_NOTE');
     });
 
@@ -302,8 +302,8 @@ describe('machine', () => {
       const context = {
         notes: [{ id, label: random.words() }],
       };
-      const IdleState = State.create({
-        value: 'IDLE',
+      const NewState = State.create({
+        value: 'NEW',
         context,
       });
 
@@ -313,7 +313,7 @@ describe('machine', () => {
             done();
           }
         })
-        .start(IdleState)
+        .start(NewState)
         .send({ type: 'NEW_NOTE', id });
     });
 
@@ -323,8 +323,8 @@ describe('machine', () => {
       const context = {
         notes: [note],
       };
-      const IdleState = State.create({
-        value: 'IDLE',
+      const NewState = State.create({
+        value: 'NEW',
         context,
       });
       const updatedNote = {
@@ -338,11 +338,11 @@ describe('machine', () => {
             done();
           }
         })
-        .start(IdleState)
+        .start(NewState)
         .send({ type: 'UPDATE_NOTE', note: updatedNote });
     });
 
-    it('stays on IDLE on CHANGE_CURRENT', (done) => {
+    it('stays on NEW on CHANGE_CURRENT', (done) => {
       const oldId = random.uuid();
       const newId = random.uuid();
       const context = {
@@ -352,18 +352,18 @@ describe('machine', () => {
         ],
         currentId: oldId,
       };
-      const IdleState = State.create({
-        value: 'IDLE',
+      const NewState = State.create({
+        value: 'NEW',
         context,
       });
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.changed === true && state.matches('IDLE')) {
+          if (state.changed === true && state.matches('NEW')) {
             done();
           }
         })
-        .start(IdleState)
+        .start(NewState)
         .send({ type: 'CHANGE_CURRENT', newId });
     });
   });
@@ -908,7 +908,7 @@ describe('machine', () => {
         .start(SavingState);
     });
 
-    it('moves to IDLE if service resolves', (done) => {
+    it('moves to SAVED if service resolves', (done) => {
       const id = random.uuid();
       const context = initContext(id);
       const testMachine = machine.withContext(context);
@@ -918,7 +918,7 @@ describe('machine', () => {
 
       interpret(testMachine)
         .onTransition((state) => {
-          if (state.matches('IDLE')) {
+          if (state.matches('SAVED')) {
             done();
           }
         })

@@ -103,7 +103,7 @@ const machine = Machine(
           success: {
             on: {
               '': {
-                target: '#machine.IDLE',
+                target: '#machine.SAVED',
                 cond: 'wasSiteDecrypted',
               },
             },
@@ -113,10 +113,10 @@ const machine = Machine(
       FREE: {
         on: {
           CREATE_EMPTY: {
-            actions: ['createEmpty', send('GO_IDLE')],
+            actions: ['createEmpty', send('GO_NEW')],
           },
-          GO_IDLE: {
-            target: 'IDLE',
+          GO_NEW: {
+            target: 'NEW',
             cond: 'wasSiteDecrypted',
           },
           CANCEL: '#machine.EXIT',
@@ -145,7 +145,7 @@ const machine = Machine(
           },
         },
       },
-      IDLE: {
+      NEW: {
         on: {
           NEW_NOTE: {
             target: '#machine.MODIFIED',
@@ -199,7 +199,7 @@ const machine = Machine(
             invoke: {
               id: 'saving',
               src: 'postSite',
-              onDone: '#machine.IDLE',
+              onDone: '#machine.SAVED',
               onError: 'error',
             },
           },
