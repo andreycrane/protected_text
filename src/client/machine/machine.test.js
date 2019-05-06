@@ -330,7 +330,7 @@ describe('machine', () => {
       currentId: note.id,
     };
 
-    it('moves to MODIFIED on NEW_NOTE', (done) => {
+    it('moves to itself on NEW_NOTE', (done) => {
       const NewState = State.create({
         value: 'NEW',
         context,
@@ -338,7 +338,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('MODIFIED')) {
+          if (state.changed === true && state.matches('NEW')) {
             const { context: newContext } = state;
             expect(newContext).toMatchObject({
               id: siteId,
@@ -374,7 +374,7 @@ describe('machine', () => {
         .send('SAVE');
     });
 
-    it('moves to MODIFIED on REMOVE_NOTE', (done) => {
+    it('moves to itself on REMOVE_NOTE', (done) => {
       const id = random.uuid();
       const NewState = State.create({
         value: 'NEW',
@@ -383,7 +383,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('MODIFIED')) {
+          if (state.changed === true && state.matches('NEW')) {
             done();
           }
         })
@@ -391,7 +391,7 @@ describe('machine', () => {
         .send({ type: 'NEW_NOTE', id });
     });
 
-    it('moves to MODIFIED on UPDATE_NOTE', (done) => {
+    it('moves to itself on UPDATE_NOTE', (done) => {
       const NewState = State.create({
         value: 'NEW',
         context,
@@ -403,7 +403,7 @@ describe('machine', () => {
 
       interpret(machine)
         .onTransition((state) => {
-          if (state.matches('MODIFIED')) {
+          if (state.changed === true && state.matches('NEW')) {
             done();
           }
         })
@@ -411,7 +411,7 @@ describe('machine', () => {
         .send({ type: 'UPDATE_NOTE', note: updatedNote });
     });
 
-    it('stays on NEW on CHANGE_CURRENT', (done) => {
+    it('moves to itself on CHANGE_CURRENT', (done) => {
       const oldId = random.uuid();
       const newId = random.uuid();
       const ctx = {

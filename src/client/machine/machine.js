@@ -148,15 +148,12 @@ const machine = Machine(
       NEW: {
         on: {
           NEW_NOTE: {
-            target: '#machine.MODIFIED',
             actions: 'newNote',
           },
           REMOVE_NOTE: {
-            target: '#machine.MODIFIED',
             actions: 'removeNote',
           },
           UPDATE_NOTE: {
-            target: '#machine.MODIFIED',
             actions: 'updateNote',
           },
           CHANGE_CURRENT: {
