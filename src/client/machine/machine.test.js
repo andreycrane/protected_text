@@ -47,6 +47,8 @@ describe('machine', () => {
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches({ ENCRYPTED: 'idle' })) {
+            expect(state.context).toHaveProperty('encrypted', encrypted);
+            expect(state.context).toHaveProperty('id', id);
             done();
           }
         })
@@ -58,11 +60,13 @@ describe('machine', () => {
       const initialContext = initContext(id);
       const testMachine = machine.withContext(initialContext);
 
-      getSiteService.mockImplementation(async () => ({ id, data: null }));
+      getSiteService.mockImplementation(async () => ({ id, encrypted: null }));
 
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches('FREE')) {
+            expect(state.context).toHaveProperty('encrypted', null);
+            expect(state.context).toHaveProperty('id', id);
             done();
           }
         })
@@ -81,7 +85,7 @@ describe('machine', () => {
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches({ INITIAL: 'error' })) {
-            expect(state.context).toMatchObject(initialContext);
+            expect(state.context).toBe(initialContext);
             done();
           }
         })
@@ -125,7 +129,8 @@ describe('machine', () => {
 
   describe('FREE state', () => {
     it('moves to NEW on CREATE_EMPTY', (done) => {
-      const context = initContext('site_name');
+      const id = random.uuid();
+      const context = initContext(id);
       const FreeState = State.create({
         value: 'FREE',
         context,
@@ -134,6 +139,11 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches('NEW')) {
+            expect(state.context).toMatchObject({
+              id,
+              encrypted: null,
+              password: null,
+            });
             expect(state.context).toHaveProperty('notes');
             expect(state.context.notes).toHaveLength(1);
             done();
@@ -162,10 +172,18 @@ describe('machine', () => {
   });
 
   describe('ENCRYPTED state', () => {
+    const siteId = random.uuid();
+    const noteId = random.uuid();
+    const note = {
+      id: noteId,
+      [random.objectElement()]: random.uuid(),
+    };
+    const notes = [note];
+    const password = internet.password();
+    const encrypted = encrypt(notes, password);
+
     it('moves to SAVED on DECRYPT if password is right', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedIdleState = State.create({
         value: { ENCRYPTED: 'idle' },
         context,
@@ -174,6 +192,13 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches('SAVED')) {
+            expect(state.context).toMatchObject({
+              id: siteId,
+              encrypted,
+              password,
+              notes,
+              currentId: note.id,
+            });
             done();
           }
         })
@@ -182,9 +207,7 @@ describe('machine', () => {
     });
 
     it('moves to ENCRYPTED.error on DECRYPT if password is wrong', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedIdleState = State.create({
         value: { ENCRYPTED: 'idle' },
         context,
@@ -193,6 +216,13 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches('ENCRYPTED.error')) {
+            expect(state.context).toMatchObject({
+              id: siteId,
+              encrypted,
+              password: null,
+              notes: null,
+              currentId: null,
+            });
             done();
           }
         })
@@ -201,9 +231,7 @@ describe('machine', () => {
     });
 
     it('moves to EXIT on CANCEL', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedIdleState = State.create({
         value: { ENCRYPTED: 'idle' },
         context,
@@ -220,9 +248,7 @@ describe('machine', () => {
     });
 
     it('moves from ENCRYPTED.error to SAVED on DECRYPT if password is right', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedErrorState = State.create({
         value: { ENCRYPTED: 'error' },
         context,
@@ -231,6 +257,13 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches('SAVED')) {
+            expect(state.context).toMatchObject({
+              id: siteId,
+              encrypted,
+              password,
+              notes,
+              currentId: note.id,
+            });
             done();
           }
         })
@@ -239,9 +272,7 @@ describe('machine', () => {
     });
 
     it('moves from ENCRYPTED.error to ENCRYPTED.error on DECRYPT if password is wrong', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedErrorState = State.create({
         value: { ENCRYPTED: 'error' },
         context,
@@ -250,6 +281,13 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches({ ENCRYPTED: 'error' })) {
+            expect(state.context).toMatchObject({
+              id: siteId,
+              encrypted,
+              password: null,
+              notes: null,
+              currentId: null,
+            });
             done();
           }
         })
@@ -258,9 +296,7 @@ describe('machine', () => {
     });
 
     it('moves from ENCRYPTED.error to EXIT on CANCEL', (done) => {
-      const password = internet.password();
-      const notes = [];
-      const context = initContext('site_name', encrypt(notes, password));
+      const context = initContext(siteId, encrypted);
       const EncryptedErrorState = State.create({
         value: { ENCRYPTED: 'error' },
         context,
@@ -278,10 +314,23 @@ describe('machine', () => {
   });
 
   describe('NEW state', () => {
-    it('moves to MODIFIED on NEW', (done) => {
-      const context = {
-        notes: [],
-      };
+    const siteId = random.uuid();
+    const noteId = random.uuid();
+    const note = {
+      id: noteId,
+      [random.objectElement()]: random.uuid(),
+    };
+    const notes = [note];
+    const password = internet.password();
+    const encrypted = encrypt(notes, password);
+    const context = {
+      ...initContext(siteId, encrypted),
+      password,
+      notes,
+      currentId: note.id,
+    };
+
+    it('moves to MODIFIED on NEW_NOTE', (done) => {
       const NewState = State.create({
         value: 'NEW',
         context,
@@ -290,6 +339,18 @@ describe('machine', () => {
       interpret(machine)
         .onTransition((state) => {
           if (state.matches('MODIFIED')) {
+            const { context: newContext } = state;
+            expect(newContext).toMatchObject({
+              id: siteId,
+              encrypted,
+              password,
+            });
+            expect(newContext).toHaveProperty('notes');
+            expect(newContext.notes).toHaveLength(notes.length + 1);
+            expect(newContext).toHaveProperty(
+              'currentId',
+              newContext.notes[newContext.notes.length - 1].id,
+            );
             done();
           }
         })
@@ -297,11 +358,24 @@ describe('machine', () => {
         .send('NEW_NOTE');
     });
 
+    it('moves to CREATE_PASSWORD on SAVE', (done) => {
+      const NewState = State.create({
+        value: 'NEW',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('CREATE_PASSWORD')) {
+            done();
+          }
+        })
+        .start(NewState)
+        .send('SAVE');
+    });
+
     it('moves to MODIFIED on REMOVE_NOTE', (done) => {
       const id = random.uuid();
-      const context = {
-        notes: [{ id, label: random.words() }],
-      };
       const NewState = State.create({
         value: 'NEW',
         context,
@@ -318,11 +392,6 @@ describe('machine', () => {
     });
 
     it('moves to MODIFIED on UPDATE_NOTE', (done) => {
-      const id = random.uuid();
-      const note = { id, label: random.words() };
-      const context = {
-        notes: [note],
-      };
       const NewState = State.create({
         value: 'NEW',
         context,
@@ -345,7 +414,7 @@ describe('machine', () => {
     it('stays on NEW on CHANGE_CURRENT', (done) => {
       const oldId = random.uuid();
       const newId = random.uuid();
-      const context = {
+      const ctx = {
         notes: [
           { id: oldId, label: random.words() },
           { id: newId, label: random.words() },
@@ -354,7 +423,7 @@ describe('machine', () => {
       };
       const NewState = State.create({
         value: 'NEW',
-        context,
+        context: ctx,
       });
 
       interpret(machine)
@@ -369,10 +438,39 @@ describe('machine', () => {
   });
 
   describe('SAVED state', () => {
+    const siteId = random.uuid();
+    const password = internet.password();
+    const note = {
+      id: random.uuid(),
+      [random.objectElement()]: random.words(),
+    };
+    const notes = [note];
+    const encrypted = encrypt(notes, password);
+    const context = {
+      id: siteId,
+      encrypted,
+      password,
+      notes,
+      currentId: note.id,
+    };
+
+    it('moves to CHANGE_PASSWORD on CHANGE_PASSWORD', (done) => {
+      const SavedState = State.create({
+        value: 'SAVED',
+        context,
+      });
+
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.matches('CHANGE_PASSWORD')) {
+            done();
+          }
+        })
+        .start(SavedState)
+        .send('CHANGE_PASSWORD');
+    });
+
     it('moves to MODIFIED on NEW_NOTE', (done) => {
-      const context = {
-        notes: [],
-      };
       const SavedState = State.create({
         value: 'SAVED',
         context,
@@ -389,10 +487,6 @@ describe('machine', () => {
     });
 
     it('moves to MODIFIED on REMOVE_NOTE', (done) => {
-      const id = random.uuid();
-      const context = {
-        notes: [{ id, label: random.words() }],
-      };
       const SavedState = State.create({
         value: 'SAVED',
         context,
@@ -405,15 +499,10 @@ describe('machine', () => {
           }
         })
         .start(SavedState)
-        .send({ type: 'NEW_NOTE', id });
+        .send({ type: 'REMOVE_NOTE', id: note.id });
     });
 
     it('moves to MODIFIED on UPDATE_NOTE', (done) => {
-      const id = random.uuid();
-      const note = { id, label: random.words() };
-      const context = {
-        notes: [note],
-      };
       const SavedState = State.create({
         value: 'SAVED',
         context,
@@ -434,15 +523,6 @@ describe('machine', () => {
     });
 
     it('stays on SAVED on CHANGE_CURRENT', (done) => {
-      const oldId = random.uuid();
-      const newId = random.uuid();
-      const context = {
-        notes: [
-          { id: oldId, label: random.words() },
-          { id: newId, label: random.words() },
-        ],
-        currentId: oldId,
-      };
       const SavedState = State.create({
         value: 'SAVED',
         context,
@@ -455,7 +535,7 @@ describe('machine', () => {
           }
         })
         .start(SavedState)
-        .send({ type: 'CHANGE_CURRENT', newId });
+        .send({ type: 'CHANGE_CURRENT', newId: note.id });
     });
   });
 
@@ -891,8 +971,23 @@ describe('machine', () => {
   });
 
   describe('SAVING state', () => {
+    const siteId = random.uuid();
+    const password = internet.password();
+    const note = {
+      id: random.uuid(),
+      [random.objectElement()]: random.word(),
+    };
+    const notes = [note];
+    const encrypted = encrypt(notes, password);
+    const context = {
+      id: siteId,
+      encrypted: null,
+      password,
+      notes,
+      currentId: note.id,
+    };
+
     it('moves to SAVING:saving children state', (done) => {
-      const context = initContext('site_name');
       const testMachine = machine.withContext(context);
       const SavingState = State.create({
         value: 'SAVING',
@@ -909,16 +1004,18 @@ describe('machine', () => {
     });
 
     it('moves to SAVED if service resolves', (done) => {
-      const id = random.uuid();
-      const context = initContext(id);
       const testMachine = machine.withContext(context);
       testMachine.initial = 'SAVING';
 
-      postSiteService.mockImplementation(async () => true);
+      postSiteService.mockImplementation(async () => ({ id: siteId, encrypted }));
 
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches('SAVED')) {
+            expect(state.context).toMatchObject({
+              ...context,
+              encrypted,
+            });
             done();
           }
         })
@@ -926,8 +1023,6 @@ describe('machine', () => {
     });
 
     it('moves to SAVING.error if service rejects', (done) => {
-      const id = random.uuid();
-      const context = initContext(id);
       const testMachine = machine.withContext(context);
       testMachine.initial = 'SAVING';
 
@@ -936,6 +1031,7 @@ describe('machine', () => {
       interpret(testMachine)
         .onTransition((state) => {
           if (state.matches({ SAVING: 'error' })) {
+            expect(state.context).toBe(context);
             done();
           }
         })
@@ -943,8 +1039,6 @@ describe('machine', () => {
     });
 
     it('moves from SAVING.error to SAVING.saving on REPEAT', (done) => {
-      const id = random.uuid();
-      const context = initContext(id);
       const testMachine = machine.withContext(context);
       const SavingState = State.create({
         value: { SAVING: 'error' },
@@ -962,8 +1056,6 @@ describe('machine', () => {
     });
 
     it('moves from SAVING.error to MODIFIED on CANCEL', (done) => {
-      const id = random.uuid();
-      const context = initContext(id);
       const testMachine = machine.withContext(context);
       const SavingState = State.create({
         value: { SAVING: 'error' },

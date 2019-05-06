@@ -162,10 +162,7 @@ const machine = Machine(
           CHANGE_CURRENT: {
             actions: 'changeCurrent',
           },
-          CHANGE_PASSWORD: {
-            target: 'CHANGE_PASSWORD',
-            cond: 'hasPassword',
-          },
+          SAVE: '#machine.CREATE_PASSWORD',
         },
       },
       MODIFIED: {
@@ -199,7 +196,12 @@ const machine = Machine(
             invoke: {
               id: 'saving',
               src: 'postSite',
-              onDone: '#machine.SAVED',
+              onDone: {
+                actions: [
+                  assign((ctx: TContext, { data }) => ({ ...ctx, ...data })),
+                ],
+                target: '#machine.SAVED',
+              },
               onError: 'error',
             },
           },

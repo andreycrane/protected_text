@@ -1,6 +1,6 @@
 // @flow
 
-import { encrypt, decrypt } from '../lib';
+import { encrypt, decrypt, isObject } from '../lib';
 
 export async function getSiteService(ctx: TContext): Promise<TContext> {
   const { id } = ctx;
@@ -14,13 +14,18 @@ export async function getSiteService(ctx: TContext): Promise<TContext> {
     throw error;
   }
 
-  return ({
-    ...ctx,
-    ...data,
-  });
+  return data;
 }
 
 export async function postSiteService(ctx: TContext): Promise<TContext> {
+  if (!isObject(ctx)
+    || typeof ctx.id !== 'string'
+    || !Array.isArray(ctx.notes)
+    || typeof ctx.password !== 'string'
+  ) {
+    throw new Error('Invalid context');
+  }
+
   const {
     id,
     notes,
@@ -40,13 +45,13 @@ export async function postSiteService(ctx: TContext): Promise<TContext> {
     },
   );
 
-  const [error] = await res.json();
+  const [error, data] = await res.json();
 
   if (error) {
     throw error;
   }
 
-  return ctx;
+  return data;
 }
 
 export async function deleteSiteService(ctx: TContext): Promise<TContext> {
