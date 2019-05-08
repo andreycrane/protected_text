@@ -15,10 +15,15 @@ export type TProps = $ReadOnly<{
   send: (args: mixed) => void,
 }>;
 
+export type TState = $ReadOnly<{
+  password: string,
+  error: boolean,
+  helperText: string,
+}>;
+
 export default function PasswordRequiredDialog(props: TProps): Node {
   const { state, send } = props;
-
-  const [localState, setLocalState] = useState({
+  const [localState, setLocalState] = useState<TState>({
     password: '',
     error: false,
     helperText: '',
@@ -26,8 +31,8 @@ export default function PasswordRequiredDialog(props: TProps): Node {
 
   useEffect(
     (): void => setLocalState(
-      localState => ({
-        ...localState,
+      (prevState: TState): TState => ({
+        ...prevState,
         error: state.matches({ ENCRYPTED: 'error' }),
         helperText: state.matches({ ENCRYPTED: 'error' }) ? 'Password is wrong' : '',
       }),
