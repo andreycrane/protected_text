@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import type { Node } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -18,17 +18,37 @@ export type TProps = $ReadOnly<{
 export default function PasswordRequiredDialog(props: TProps): Node {
   const { state, send } = props;
 
-  const [password, setPassword] = useState('');
+  const [localState, setLocalState] = useState({
+    password: '',
+    error: false,
+    helperText: '',
+  });
+
+  useEffect(
+    (): void => setLocalState(
+      localState => ({
+        ...localState,
+        error: state.matches({ ENCRYPTED: 'error' }),
+        helperText: state.matches({ ENCRYPTED: 'error' }) ? 'Password is wrong' : '',
+      }),
+    ),
+    [state],
+  );
+
   const onChangePassword = useCallback(
     (e) => {
       const { value } = e.target;
-      setPassword(value);
+      setLocalState({
+        password: value,
+        error: false,
+        helperText: '',
+      });
     },
-    [setPassword],
+    [setLocalState],
   );
 
   function onDecrypt() {
-    send({ type: 'DECRYPT', password });
+    send({ type: 'DECRYPT', password: localState.password });
   }
 
   function onCancel() {
@@ -44,14 +64,16 @@ export default function PasswordRequiredDialog(props: TProps): Node {
           If this is your site enter the password.
         </DialogContentText>
         <TextField
+          error={localState.error}
           autoFocus
           margin="dense"
           id="password"
           label="Password used to encrypt this site"
           type="password"
           fullWidth
-          value={password}
+          value={localState.password}
           onChange={onChangePassword}
+          helperText={localState.helperText}
         />
       </DialogContent>
       <DialogActions>
