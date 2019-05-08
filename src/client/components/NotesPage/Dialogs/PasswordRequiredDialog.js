@@ -61,7 +61,11 @@ export default function PasswordRequiredDialog(props: TProps): Node {
   }
 
   return (
-    <Dialog open={state.matches('ENCRYPTED')}>
+    <Dialog
+      open={state.matches('ENCRYPTED')}
+      disableBackdropClick
+      disableEscapeKeyDown
+    >
       <DialogTitle>Password required</DialogTitle>
       <DialogContent>
         <DialogContentText>

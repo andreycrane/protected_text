@@ -2,12 +2,12 @@
 
 import React, { useCallback } from 'react';
 import type { Node } from 'react';
+
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 
 export type TProps = $ReadOnly<{
@@ -15,43 +15,43 @@ export type TProps = $ReadOnly<{
   send: (args: mixed) => void,
 }>;
 
-export default function CreateNewDialog(props: TProps): Node {
+export default function DeleteConfirmDialog(props: TProps): Node {
   const { state, send } = props;
 
-  const onCreateSite = useCallback((): void => send('CREATE_EMPTY'));
-  function onCancel() {
-    send('CANCEL');
-  }
+  const onYes = useCallback(
+    (): void => send('OK'),
+    [send],
+  );
+
+  const onNo = useCallback(
+    (): void => send('CANCEL'),
+    [send],
+  );
 
   return (
     <Dialog
-      open={state.matches('FREE')}
+      open={state.matches({ DELETING: 'confirm' })}
+      maxWidth="sm"
       disableBackdropClick
       disableEscapeKeyDown
     >
-      <DialogTitle>Create new site?</DialogTitle>
+      <DialogTitle>Delete site</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {'Great! This site doesn\'t exist, it can be yours! Would you like to create:'}
+          {'Are you sure?'}
         </DialogContentText>
-        <Typography
-          align="center"
-          variant="h6"
-        >
-          {state.context.id}
-        </Typography>
       </DialogContent>
       <DialogActions>
         <Button
           color="primary"
-          onClick={onCreateSite}
+          onClick={onYes}
         >
-          Create site
+          Yes
         </Button>
         <Button
-          onClick={onCancel}
+          onClick={onNo}
         >
-          Cancel
+          No
         </Button>
       </DialogActions>
     </Dialog>

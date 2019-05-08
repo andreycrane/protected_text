@@ -57,7 +57,11 @@ export default function BasePasswordDialog(props: TProps): Node {
   }
 
   return (
-    <Dialog open={open}>
+    <Dialog
+      open={open}
+      disableBackdropClick
+      disableEscapeKeyDown
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>
