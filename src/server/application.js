@@ -8,7 +8,18 @@ module.exports = config => {
   const app = express();
   const db = new Keyv(...config.connectionParams);
 
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({
+    limit: '5kb',
+  }));
+  app.use((error, req, res, next) => {
+    // Catch bodyParser error
+    if (error) {
+      res.json([error, null]);
+      return;
+    }
+
+    next();
+  });
 
   app.get('/api/id/:id', async (req, res) => {
     try {

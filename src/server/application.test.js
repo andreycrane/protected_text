@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { random } from 'faker';
+import { random, lorem } from 'faker';
 import createApp from './application';
 
 describe('server#application', function () {
@@ -122,5 +122,25 @@ describe('server#application', function () {
       .expect(
         404,
       );
+  });
+
+  it('throws an error if data size more than 5kb', async () => {
+    const len = 6 * 1024;
+    const id = random.uuid();
+    const encrypted = new Array(len + 1).join('-');
+
+    await request(this.app)
+      .post(`/api/id/${id}`)
+      .send({ encrypted })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        const { body } = res;
+
+        expect(Array.isArray(body)).toBe(true);
+        expect(body).toHaveLength(2);
+        expect(body[0]).toHaveProperty('type', 'entity.too.large');
+        expect(body[1]).toBeNull();
+      });
   });
 });
