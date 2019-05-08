@@ -4,7 +4,9 @@
   "description": "Small service for storing encrypted notes",
   "main": "index.js",
   "scripts": {
-    "server:development": "webpack-dev-server --color --progress",
+    "build:development": "webpack --config webpack.dev.config.js",
+    "build:production": "webpack --config webpack.prod.config.js",
+    "server:development": "webpack-dev-server --color --progress --config webpack.dev.config.js",
     "test": "jest -c jest.config.js",
     "test:watch": "npm run test -- --watch",
     "test:client": "jest -c jest.client.config.js",
