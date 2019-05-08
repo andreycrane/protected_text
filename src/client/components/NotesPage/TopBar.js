@@ -28,6 +28,19 @@ export function TopBarComponent(props: TProps): Node {
     [send],
   );
 
+  const onDelete = useCallback(
+    (): void => send('DELETE'),
+    [send],
+  );
+
+  function isSaveDisabled(): boolean {
+    return !(state.matches('NEW') || state.matches('MODIFIED'));
+  }
+
+  function isDeleteDisabled(): boolean {
+    return !(state.matches('SAVED') || state.matches('MODIFIED'));
+  }
+
   return (
     <AppBar position="relative">
       <Toolbar>
@@ -53,7 +66,7 @@ export function TopBarComponent(props: TProps): Node {
               <Grid item>
                 <Button
                   variant="contained"
-                  disabled={!state.matches('MODIFIED')}
+                  disabled={isSaveDisabled()}
                   onClick={onSave}
                 >
                     Save
@@ -66,6 +79,15 @@ export function TopBarComponent(props: TProps): Node {
                   onClick={onChangePassword}
                 >
                   Change password
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="contained"
+                  disabled={isDeleteDisabled()}
+                  onClick={onDelete}
+                >
+                  Delete
                 </Button>
               </Grid>
             </Grid>
