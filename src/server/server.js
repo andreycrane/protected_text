@@ -1,6 +1,9 @@
+const path = require('path');
+const express = require('express');
+const fallback = require('express-history-api-fallback');
 const createApp = require('./application');
 
-const { app, db } = createApp({
+const { app } = createApp({
   connectionParams: [
     {
       store: new Map(),
@@ -8,9 +11,13 @@ const { app, db } = createApp({
   ],
 });
 
-const port = 3000;
+const PORT = process.env.PORT || 5000;
+const root = path.join(process.cwd(), 'dist');
+
+app.use(express.static(root));
+app.use(fallback('index.html', { root }));
 
 app.listen(
-  port,
-  () => console.log(`Example app listening on port ${port}!`),
+  PORT,
+  () => console.log(`Example app listening on port ${PORT}!`),
 );

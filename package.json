@@ -7,12 +7,17 @@
     "build:development": "webpack --config webpack.dev.config.js",
     "build:production": "webpack --config webpack.prod.config.js",
     "server:development": "webpack-dev-server --color --progress --config webpack.dev.config.js",
+    "server:production": "node ./src/server/server.js",
     "test": "jest -c jest.config.js",
     "test:watch": "npm run test -- --watch",
     "test:client": "jest -c jest.client.config.js",
     "test:server": "jest -c jest.server.config.js",
     "test:client:watch": "npm run test:client -- --watch",
-    "test:server:watch": "npm run test:server -- --watch"
+    "test:server:watch": "npm run test:server -- --watch",
+    "heroku-postbuild": "npm run build:production"
+  },
+  "engines": {
+    "node": "10.15.3"
   },
   "husky": {
     "hooks": {
@@ -61,7 +66,9 @@
     "crypto-js": "^3.1.9-1",
     "draft-js": "^0.10.5",
     "express": "^4.16.4",
+    "express-history-api-fallback": "^2.2.1",
     "keyv": "^3.1.0",
+    "morgan": "^1.9.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router-dom": "^5.0.0",

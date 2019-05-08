@@ -3,11 +3,13 @@
 const express = require('express');
 const Keyv = require('keyv');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
 
 module.exports = config => {
   const app = express();
   const db = new Keyv(...config.connectionParams);
 
+  app.use(morgan('combined'));
   app.use(bodyParser.json({
     limit: '5kb',
   }));
