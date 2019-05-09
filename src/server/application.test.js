@@ -117,12 +117,10 @@ describe('server#application', function () {
       );
   });
 
-  it('returns 404 if accepts unrecognized url', async () => {
+  it('returns 200 if accepts unrecognized url', async () => {
     await request(this.app)
       .get('/id/lol/test')
-      .expect(
-        404,
-      );
+      .expect(200);
   });
 
   it('throws an error if data size more than 5kb', async () => {

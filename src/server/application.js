@@ -9,7 +9,7 @@ const morgan = require('morgan');
 
 const router = require('./router');
 
-module.exports.prodApp = (config) => {
+module.exports.prodApp = (config = {}) => {
   const dbConnParams = config.dbConnParams || [{ store: new Map() }];
   const logger = config.logger || morgan('tiny');
 
@@ -41,12 +41,12 @@ module.exports.prodApp = (config) => {
   return { app, db };
 };
 
-module.exports.devApp = (config) => {
+module.exports.webpackApp = (config = {}) => {
   const dbConnParams = config.dbConnParams || [{ store: new Map() }];
+  const logger = config.logger || morgan('tiny');
 
   const app = express();
   const db = new Keyv(...dbConnParams);
-  const logger = morgan('tiny');
 
   app.set('db', db);
   app.use(logger);
