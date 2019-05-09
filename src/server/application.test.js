@@ -1,18 +1,19 @@
 import request from 'supertest';
-import { random, lorem } from 'faker';
-import createApp from './application';
+import { random } from 'faker';
+import { prodApp } from './application';
 
 describe('server#application', function () {
   beforeAll(() => {
     this.namespace = random.uuid();
     this.store = new Map();
-    const { app, db } = createApp({
-      connectionParams: [
+    const { app, db } = prodApp({
+      dbConnParams: [
         {
           namespace: this.namespace,
           store: this.store,
         },
       ],
+      logger: (error, req, res, next) => next(),
     });
 
     this.app = app;

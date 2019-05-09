@@ -1,15 +1,23 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const Keyv = require('keyv');
 const bodyParser = require('body-parser');
+const fallback = require('express-history-api-fallback');
 const morgan = require('morgan');
 
-module.exports = config => {
-  const app = express();
-  const db = new Keyv(...config.connectionParams);
+const router = require('./router');
 
-  app.use(morgan('combined'));
+module.exports.prodApp = (config) => {
+  const dbConnParams = config.dbConnParams || [{ store: new Map() }];
+  const logger = config.logger || morgan('tiny');
+
+  const app = express();
+  const db = new Keyv(...dbConnParams);
+
+  app.set('db', db);
+  app.use(logger);
   app.use(bodyParser.json({
     limit: '5kb',
   }));
@@ -23,46 +31,39 @@ module.exports = config => {
     next();
   });
 
-  app.get('/api/id/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const encrypted = await db.get(id);
+  app.use(router);
 
-      if (!encrypted) {
-        res.json([null, { id, encrypted: null }]);
-        return;
-      }
+  const root = path.join(process.cwd(), 'dist');
 
-      res.json([null, { id, encrypted }]);
-    } catch (error) {
+  app.use(express.static(root));
+  app.use(fallback('index.html', { root }));
+
+  return { app, db };
+};
+
+module.exports.devApp = (config) => {
+  const dbConnParams = config.dbConnParams || [{ store: new Map() }];
+
+  const app = express();
+  const db = new Keyv(...dbConnParams);
+  const logger = morgan('tiny');
+
+  app.set('db', db);
+  app.use(logger);
+  app.use(bodyParser.json({
+    limit: '5kb',
+  }));
+  app.use((error, req, res, next) => {
+    // Catch bodyParser error
+    if (error) {
       res.json([error, null]);
+      return;
     }
+
+    next();
   });
 
-  app.post('/api/id/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { encrypted } = req.body;
-
-      await db.set(id, encrypted);
-
-      res.json([null, { id, encrypted }]);
-    } catch (error) {
-      res.json([error, null]);
-    }
-  });
-
-  app.delete('/api/id/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      await db.delete(id);
-
-      res.json([null, { id, encrypted: null }]);
-    } catch (error) {
-      res.json([error, null]);
-    }
-  });
+  app.use(router);
 
   return { app, db };
 };

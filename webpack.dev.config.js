@@ -1,4 +1,4 @@
-const createApp = require('./src/server/application');
+const { devApp } = require('./src/server/application');
 const baseConfig = require('./webpack.base.config');
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
     contentBase: './dist',
     historyApiFallback: true,
     before(app) {
-      const { app: serverApp } = createApp(
+      const { app: serverApp } = devApp(
         {
           connectionParams: [
             { store: new Map() },
