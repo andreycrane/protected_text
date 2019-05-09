@@ -13,6 +13,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
 
+import { isValidUrl } from '../../lib';
+
 const styles = (): TStyles => ({
   container: {
     display: 'flex',
@@ -36,6 +38,9 @@ const styles = (): TStyles => ({
     margin: '120px auto',
     padding: '10px 15px',
   },
+  urlInput: {
+    marginBottom: '15px',
+  },
 });
 
 export type TProps = $ReadOnly<{
@@ -44,18 +49,49 @@ export type TProps = $ReadOnly<{
 }>;
 
 
+export type TState = $ReadOnly<{
+  siteName: string,
+  error: boolean,
+}>;
+
+const defaultState: TState = {
+  siteName: '',
+  error: false,
+  helperText: '',
+};
+
 export function MainPageComponent(props: TProps): Node {
   const { classes, history } = props;
 
-  const [siteName, setSiteName] = useState('');
+  const [state, setState] = useState<TState>(defaultState);
 
   function onChangeName(e) {
     const { value } = e.target;
 
-    setSiteName(value);
+    setState(
+      (prevState: TState): TState => ({
+        ...prevState,
+        siteName: value,
+        error: false,
+      }),
+    );
   }
 
-  function onGoClick() {
+  function onSubmit(e) {
+    e.preventDefault();
+
+    const { siteName } = state;
+
+    if (isValidUrl(siteName) !== true) {
+      setState(
+        (prevState: TState): TState => ({
+          ...prevState,
+          error: true,
+        }),
+      );
+      return;
+    }
+
     history.push(`/${siteName}`);
   }
 
@@ -75,24 +111,30 @@ export function MainPageComponent(props: TProps): Node {
           className={classes.paper}
         >
           <Typography variant="h6">
-            {'Go to protectedText.com/'}
+            {`Go to protectedText.com/${state.siteName}`}
           </Typography>
-          <form noValidate autoComplete="off">
+          <form
+            noValidate
+            autoComplete="off"
+            onSubmit={onSubmit}
+          >
             <TextField
+              error={state.error}
               id="site-name"
               label="Site name"
-              margin="normal"
               fullWidth
+              margin="normal"
               onChange={onChangeName}
-              value={siteName}
+              value={state.siteName}
+              helperText="url must be a string of A-Za-z0-9_-"
+              className={classes.urlInput}
             />
             <Button
-              type="button"
+              type="submit"
               fullWidth
               variant="contained"
               size="large"
               color="primary"
-              onClick={onGoClick}
             >
               Go
             </Button>
