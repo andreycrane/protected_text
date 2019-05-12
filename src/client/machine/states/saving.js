@@ -21,7 +21,19 @@ const SAVING = {
     error: {
       on: {
         REPEAT: 'saving',
-        CANCEL: '#machine.MODIFIED',
+        CANCEL: [
+          {
+            target: '#machine.MODIFIED',
+            cond: ({ prevState }) => prevState === 'MODIFIED',
+          },
+          {
+            target: '#machine.NEW',
+            cond: ({ prevState }) => prevState === 'NEW',
+          },
+          {
+            target: '#machine.NEW',
+          },
+        ],
       },
     },
   },

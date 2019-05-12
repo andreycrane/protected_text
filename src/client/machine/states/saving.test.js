@@ -98,20 +98,29 @@ describe('machine#SAVING state', () => {
       .send('REPEAT');
   });
 
-  it('moves from SAVING.error to MODIFIED on CANCEL', (done) => {
-    const testMachine = machine.withContext(context);
-    const SavingState = State.create({
-      value: { SAVING: 'error' },
-      context,
-    });
+  [
+    { prevState: 'MODIFIED', expectedState: 'MODIFIED' },
+    { prevState: 'NEW', expectedState: 'NEW' },
+    { prevState: null, expectedState: 'NEW' },
+  ].forEach(({ prevState, expectedState }) => {
+    it(`moves from SAVING.error to ${expectedState} on CANCEL if prevState is equal ${prevState}`, (done) => {
+      const testMachine = machine.withContext(context);
+      const SavingState = State.create({
+        value: { SAVING: 'error' },
+        context: {
+          ...context,
+          prevState,
+        },
+      });
 
-    interpret(testMachine)
-      .onTransition((state) => {
-        if (state.matches('MODIFIED')) {
-          done();
-        }
-      })
-      .start(SavingState)
-      .send('CANCEL');
+      interpret(testMachine)
+        .onTransition((state) => {
+          if (state.matches(expectedState)) {
+            done();
+          }
+        })
+        .start(SavingState)
+        .send('CANCEL');
+    });
   });
 });
