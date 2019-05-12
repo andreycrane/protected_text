@@ -59,7 +59,14 @@ export function TopBarComponent(props: TProps): Node {
           />
         </Hidden>
         <Hidden mdUp>
-          <MobileToolbar />
+          <MobileToolbar
+            onSave={onSave}
+            onChangePassword={onChangePassword}
+            onDelete={onDelete}
+            isSaveDisabled={isSaveDisabled()}
+            isDeleteDisabled={isDeleteDisabled()}
+            isChgPasswdDisabled={isChgPasswdDisabled()}
+          />
         </Hidden>
       </Toolbar>
     </AppBar>
