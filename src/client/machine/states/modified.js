@@ -1,5 +1,7 @@
 // @flow
 
+import { assign } from 'xstate';
+
 const MODIFIED = {
   on: {
     NEW_NOTE: {
@@ -15,14 +17,41 @@ const MODIFIED = {
       actions: 'changeCurrent',
     },
     SAVE: [
-      { target: 'SAVING', cond: 'hasPassword' },
-      { target: 'CREATE_PASSWORD' },
+      {
+        target: 'SAVING',
+        cond: 'hasPassword',
+        actions: [
+          assign({
+            prevState: 'MODIFIED',
+          }),
+        ],
+      },
+      {
+        target: 'CREATE_PASSWORD',
+        actions: [
+          assign({
+            prevState: 'MODIFIED',
+          }),
+        ],
+      },
     ],
     CHANGE_PASSWORD: {
-      target: 'CHANGE_PASSWORD',
+      target: '#machine.CHANGE_PASSWORD',
       cond: 'hasPassword',
+      actions: [
+        assign({
+          prevState: 'MODIFIED',
+        }),
+      ],
     },
-    DELETE: '#machine.DELETING',
+    DELETE: {
+      target: '#machine.DELETING',
+      actions: [
+        assign({
+          prevState: 'MODIFIED',
+        }),
+      ],
+    },
   },
 };
 

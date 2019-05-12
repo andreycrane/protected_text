@@ -20,6 +20,7 @@ describe('machine#SAVED state', () => {
     password,
     notes,
     currentId: note.id,
+    prevState: null,
   };
 
   it('moves to CHANGE_PASSWORD on CHANGE_PASSWORD', (done) => {
@@ -31,6 +32,10 @@ describe('machine#SAVED state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.matches('CHANGE_PASSWORD')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            prevState: 'SAVED',
+          });
           done();
         }
       })
@@ -99,6 +104,10 @@ describe('machine#SAVED state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.matches('DELETING')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            prevState: 'SAVED',
+          });
           done();
         }
       })

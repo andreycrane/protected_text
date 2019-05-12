@@ -1,13 +1,29 @@
 import { interpret, State } from 'xstate';
 import { random, internet } from 'faker';
 
+import { encrypt } from '../../lib';
 import machine from '../machine';
 
 describe('machine#MODIFIED state', () => {
+  const siteId = random.uuid();
+  const noteId = random.uuid();
+  const note = {
+    id: noteId,
+    label: random.word(),
+  };
+  const notes = [note];
+  const password = internet.password();
+  const encrypted = encrypt(notes, password);
+  const context = {
+    id: siteId,
+    encrypted,
+    password,
+    notes,
+    currentId: noteId,
+    prevState: null,
+  };
+
   it('moves to MODIFIED on NEW_NOTE', (done) => {
-    const context = {
-      notes: [],
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -25,9 +41,6 @@ describe('machine#MODIFIED state', () => {
 
   it('moves to MODIFIED on REMOVE_NOTE', (done) => {
     const id = random.uuid();
-    const context = {
-      notes: [{ id, label: random.words() }],
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -44,11 +57,6 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('moves to MODIFIED on UPDATE_NOTE', (done) => {
-    const id = random.uuid();
-    const note = { id, label: random.words() };
-    const context = {
-      notes: [note],
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -69,15 +77,7 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('stays on MODIFIED on CHANGE_CURRENT', (done) => {
-    const oldId = random.uuid();
     const newId = random.uuid();
-    const context = {
-      notes: [
-        { id: oldId, label: random.words() },
-        { id: newId, label: random.words() },
-      ],
-      currentId: oldId,
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -94,21 +94,22 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('moves to CREATE_PASSWORD on SAVE if password doesn\'t exist', (done) => {
-    const context = {
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
-      context,
+      context: {
+        ...context,
+        password: null,
+      },
     });
 
     interpret(machine)
       .onTransition((state) => {
         if (state.changed === true && state.matches('CREATE_PASSWORD')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            password: null,
+            prevState: 'MODIFIED',
+          });
           done();
         }
       })
@@ -117,14 +118,6 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('moves to SAVING on SAVE if password exists', (done) => {
-    const context = {
-      password: internet.password(),
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -133,6 +126,10 @@ describe('machine#MODIFIED state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.changed === true && state.matches('SAVING')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            prevState: 'MODIFIED',
+          });
           done();
         }
       })
@@ -141,14 +138,6 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('moves to CHANGE_PASSWORD on CHANGE_PASSWORD if password exists', (done) => {
-    const context = {
-      password: internet.password(),
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -157,6 +146,10 @@ describe('machine#MODIFIED state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.changed === true && state.matches('CHANGE_PASSWORD')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            prevState: 'MODIFIED',
+          });
           done();
         }
       })
@@ -165,11 +158,6 @@ describe('machine#MODIFIED state', () => {
   });
 
   it('moves to DELETING on DELETE', (done) => {
-    const id = random.uuid();
-    const note = { id, label: random.words() };
-    const context = {
-      notes: [note],
-    };
     const ModifiedState = State.create({
       value: 'MODIFIED',
       context,
@@ -178,6 +166,10 @@ describe('machine#MODIFIED state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.matches('DELETING')) {
+          expect(state.context).toMatchObject({
+            ...context,
+            prevState: 'MODIFIED',
+          });
           done();
         }
       })

@@ -109,18 +109,9 @@ describe('machine#NEW state', () => {
   });
 
   it('moves to itself on CHANGE_CURRENT', (done) => {
-    const oldId = random.uuid();
-    const newId = random.uuid();
-    const ctx = {
-      notes: [
-        { id: oldId, label: random.words() },
-        { id: newId, label: random.words() },
-      ],
-      currentId: oldId,
-    };
     const NewState = State.create({
       value: 'NEW',
-      context: ctx,
+      context,
     });
 
     interpret(machine)
@@ -130,6 +121,6 @@ describe('machine#NEW state', () => {
         }
       })
       .start(NewState)
-      .send({ type: 'CHANGE_CURRENT', newId });
+      .send({ type: 'CHANGE_CURRENT', newId: noteId });
   });
 });

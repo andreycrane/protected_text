@@ -1,5 +1,7 @@
 // @flow
 
+import { assign } from 'xstate';
+
 const SAVED = {
   on: {
     NEW_NOTE: {
@@ -20,8 +22,20 @@ const SAVED = {
     CHANGE_PASSWORD: {
       target: 'CHANGE_PASSWORD',
       cond: 'hasPassword',
+      actions: [
+        assign({
+          prevState: 'SAVED',
+        }),
+      ],
     },
-    DELETE: '#machine.DELETING',
+    DELETE: {
+      target: '#machine.DELETING',
+      actions: [
+        assign({
+          prevState: 'SAVED',
+        }),
+      ],
+    },
   },
 };
 
