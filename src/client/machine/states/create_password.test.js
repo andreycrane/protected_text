@@ -4,15 +4,23 @@ import { random, internet } from 'faker';
 import machine from '../machine';
 
 describe('machine#CREATE_PASSWORD state', () => {
-  it('moves to MODIFIED on CANCEL', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
+  const siteId = random.uuid();
+  const noteId = random.uuid();
+  const note = {
+    id: noteId,
+    label: random.word(),
+  };
+  const notes = [note];
+  const context = {
+    id: siteId,
+    encrypted: null,
+    password: null,
+    notes,
+    currentId: note.id,
+    prevState: 'NEW',
+  };
+
+  it('moves to prevState on CANCEL', (done) => {
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'idle' },
       context,
@@ -20,7 +28,7 @@ describe('machine#CREATE_PASSWORD state', () => {
 
     interpret(machine)
       .onTransition((state) => {
-        if (state.changed === true && state.matches('MODIFIED')) {
+        if (state.changed === true && state.matches(context.prevState)) {
           done();
         }
       })
@@ -29,14 +37,6 @@ describe('machine#CREATE_PASSWORD state', () => {
   });
 
   it('moves to SAVING on CREATE if password exists', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'idle' },
       context,
@@ -53,14 +53,6 @@ describe('machine#CREATE_PASSWORD state', () => {
   });
 
   it('moves to { CREATE_PASSWORD: error } on CREATE if password doesn\'t exist', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'idle' },
       context,
@@ -76,15 +68,7 @@ describe('machine#CREATE_PASSWORD state', () => {
       .send({ type: 'CREATE', password: null });
   });
 
-  it('moves from { CREATE_PASSWORD: error } to MODIFIED on CANCEL', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
+  it('moves from { CREATE_PASSWORD: error } to prevState on CANCEL', (done) => {
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'error' },
       context,
@@ -92,7 +76,7 @@ describe('machine#CREATE_PASSWORD state', () => {
 
     interpret(machine)
       .onTransition((state) => {
-        if (state.changed === true && state.matches('MODIFIED')) {
+        if (state.changed === true && state.matches(context.prevState)) {
           done();
         }
       })
@@ -101,14 +85,6 @@ describe('machine#CREATE_PASSWORD state', () => {
   });
 
   it('moves from { CREATE_PASSWORD: error } to SAVING on CREATE if password exists', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const password = internet.password();
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'error' },
@@ -126,14 +102,6 @@ describe('machine#CREATE_PASSWORD state', () => {
   });
 
   it('moves from { CREATE_PASSWORD: error } to itself on CREATE if password doesn\'t exist', (done) => {
-    const context = {
-      password: null,
-      notes: [
-        { id: random.uuid(), label: random.words() },
-        { id: random.uuid(), label: random.words() },
-      ],
-      currentId: random.uuid(),
-    };
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'error' },
       context,

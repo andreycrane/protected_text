@@ -60,6 +60,10 @@ describe('machine#NEW state', () => {
     interpret(machine)
       .onTransition((state) => {
         if (state.matches('CREATE_PASSWORD')) {
+          expect(state.context).toMatchObject({
+            ...state.context,
+            prevState: 'NEW',
+          });
           done();
         }
       })

@@ -1,5 +1,7 @@
 // @flow
 
+import { assign } from 'xstate';
+
 const NEW = {
   on: {
     NEW_NOTE: {
@@ -14,7 +16,14 @@ const NEW = {
     CHANGE_CURRENT: {
       actions: 'changeCurrent',
     },
-    SAVE: '#machine.CREATE_PASSWORD',
+    SAVE: {
+      target: '#machine.CREATE_PASSWORD',
+      actions: [
+        assign({
+          prevState: 'NEW',
+        }),
+      ],
+    },
   },
 };
 

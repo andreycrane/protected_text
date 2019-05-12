@@ -15,7 +15,15 @@ const CREATE_PASSWORD = {
             target: 'error',
           },
         ],
-        CANCEL: '#machine.MODIFIED',
+        CANCEL: [
+          {
+            target: '#machine.NEW',
+            cond: ({ prevState }) => prevState === 'NEW',
+          },
+          {
+            target: '#machine.NEW',
+          },
+        ],
       },
     },
     error: {
@@ -30,7 +38,15 @@ const CREATE_PASSWORD = {
             target: 'error',
           },
         ],
-        CANCEL: '#machine.MODIFIED',
+        CANCEL: [
+          {
+            target: '#machine.NEW',
+            cond: ({ prevState }) => prevState === 'NEW',
+          },
+          {
+            target: '#machine.NEW',
+          },
+        ],
       },
     },
     success: {
