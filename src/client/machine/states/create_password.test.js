@@ -20,7 +20,7 @@ describe('machine#CREATE_PASSWORD state', () => {
     prevState: 'NEW',
   };
 
-  it('moves to prevState on CANCEL', (done) => {
+  it('moves to NEW on CANCEL if prevState is equal NEW', (done) => {
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'idle' },
       context,
@@ -68,7 +68,7 @@ describe('machine#CREATE_PASSWORD state', () => {
       .send({ type: 'CREATE', password: null });
   });
 
-  it('moves from { CREATE_PASSWORD: error } to prevState on CANCEL', (done) => {
+  it('moves from { CREATE_PASSWORD: error } to NEW on CANCEL if prevState is equal NEW', (done) => {
     const CreatePassword = State.create({
       value: { CREATE_PASSWORD: 'error' },
       context,

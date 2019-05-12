@@ -15,9 +15,19 @@ const CHANGE_PASSWORD = {
             target: 'error',
           },
         ],
-        CANCEL: {
-          target: '#machine.MODIFIED',
-        },
+        CANCEL: [
+          {
+            target: '#machine.MODIFIED',
+            cond: ({ prevState }) => prevState === 'MODIFIED',
+          },
+          {
+            target: '#machine.SAVED',
+            cond: ({ prevState }) => prevState === 'SAVED',
+          },
+          {
+            target: '#machine.MODIFIED',
+          },
+        ],
       },
     },
     error: {
@@ -32,9 +42,19 @@ const CHANGE_PASSWORD = {
             target: 'error',
           },
         ],
-        CANCEL: {
-          target: '#machine.MODIFIED',
-        },
+        CANCEL: [
+          {
+            target: '#machine.MODIFIED',
+            cond: ({ prevState }) => prevState === 'MODIFIED',
+          },
+          {
+            target: '#machine.SAVED',
+            cond: ({ prevState }) => prevState === 'SAVED',
+          },
+          {
+            target: '#machine.MODIFIED',
+          },
+        ],
       },
     },
   },
