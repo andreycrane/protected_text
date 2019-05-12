@@ -14,7 +14,7 @@
 .note-editor-inline-styles {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-start;
   align-content: flex-start;
   align-items: center;
