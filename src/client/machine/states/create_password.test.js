@@ -20,20 +20,28 @@ describe('machine#CREATE_PASSWORD state', () => {
     prevState: 'NEW',
   };
 
-  it('moves to NEW on CANCEL if prevState is equal NEW', (done) => {
-    const CreatePassword = State.create({
-      value: { CREATE_PASSWORD: 'idle' },
-      context,
-    });
+  [
+    { prevState: 'NEW', expectedState: 'NEW' },
+    { prevState: null, expectedState: 'NEW' },
+  ].forEach(({ prevState, expectedState }) => {
+    it(`moves from { CREATE_PASSWORD: idle } to ${expectedState} on CANCEL if prevState is equal ${prevState}`, (done) => {
+      const CreatePassword = State.create({
+        value: { CREATE_PASSWORD: 'idle' },
+        context: {
+          ...context,
+          prevState,
+        },
+      });
 
-    interpret(machine)
-      .onTransition((state) => {
-        if (state.changed === true && state.matches(context.prevState)) {
-          done();
-        }
-      })
-      .start(CreatePassword)
-      .send('CANCEL');
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches(expectedState)) {
+            done();
+          }
+        })
+        .start(CreatePassword)
+        .send('CANCEL');
+    });
   });
 
   it('moves to SAVING on CREATE if password exists', (done) => {
@@ -68,20 +76,28 @@ describe('machine#CREATE_PASSWORD state', () => {
       .send({ type: 'CREATE', password: null });
   });
 
-  it('moves from { CREATE_PASSWORD: error } to NEW on CANCEL if prevState is equal NEW', (done) => {
-    const CreatePassword = State.create({
-      value: { CREATE_PASSWORD: 'error' },
-      context,
-    });
+  [
+    { prevState: 'NEW', expectedState: 'NEW' },
+    { prevState: null, expectedState: 'NEW' },
+  ].forEach(({ prevState, expectedState }) => {
+    it(`moves from { CREATE_PASSWORD: error } to ${expectedState} on CANCEL if prevState is equal ${prevState}`, (done) => {
+      const CreatePassword = State.create({
+        value: { CREATE_PASSWORD: 'error' },
+        context: {
+          ...context,
+          prevState,
+        },
+      });
 
-    interpret(machine)
-      .onTransition((state) => {
-        if (state.changed === true && state.matches(context.prevState)) {
-          done();
-        }
-      })
-      .start(CreatePassword)
-      .send('CANCEL');
+      interpret(machine)
+        .onTransition((state) => {
+          if (state.changed === true && state.matches(expectedState)) {
+            done();
+          }
+        })
+        .start(CreatePassword)
+        .send('CANCEL');
+    });
   });
 
   it('moves from { CREATE_PASSWORD: error } to SAVING on CREATE if password exists', (done) => {
