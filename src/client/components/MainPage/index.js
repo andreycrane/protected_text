@@ -35,6 +35,7 @@ const styles = (): TStyles => ({
   },
   paper: {
     minWidth: '400px',
+    maxWidth: '95vw',
     margin: '120px auto',
     padding: '10px 15px',
   },
@@ -110,7 +111,10 @@ export function MainPageComponent(props: TProps): Node {
           square
           className={classes.paper}
         >
-          <Typography variant="h6">
+          <Typography
+            variant="h6"
+            noWrap
+          >
             {`Go to protectedText.com/${state.siteName}`}
           </Typography>
           <form
