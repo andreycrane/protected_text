@@ -6,7 +6,19 @@ const DELETING = {
     confirm: {
       on: {
         OK: 'deleting',
-        CANCEL: '#machine.MODIFIED',
+        CANCEL: [
+          {
+            target: '#machine.MODIFIED',
+            cond: ({ prevState }) => prevState === 'MODIFIED',
+          },
+          {
+            target: '#machine.SAVED',
+            cond: ({ prevState }) => prevState === 'SAVED',
+          },
+          {
+            target: '#machine.MODIFIED',
+          },
+        ],
       },
     },
     deleting: {
@@ -20,7 +32,19 @@ const DELETING = {
     error: {
       on: {
         REPEAT: 'deleting',
-        CANCEL: '#machine.MODIFIED',
+        CANCEL: [
+          {
+            target: '#machine.MODIFIED',
+            cond: ({ prevState }) => prevState === 'MODIFIED',
+          },
+          {
+            target: '#machine.SAVED',
+            cond: ({ prevState }) => prevState === 'SAVED',
+          },
+          {
+            target: '#machine.MODIFIED',
+          },
+        ],
       },
     },
   },
