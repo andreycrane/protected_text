@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { random, internet } from 'faker';
+import { random } from 'faker';
 import { prodApp } from './application';
 
 describe('server#application', function () {
@@ -115,17 +115,6 @@ describe('server#application', function () {
         200,
         [null, { id, encrypted: null }],
       );
-  });
-
-  it('returns 404 if accepts unrecognized url', async () => {
-    const samples = [
-      `/${internet.domainWord()}`,
-      `/${internet.domainWord()}/${internet.domainWord()}`,
-      `/${internet.domainWord()}/${internet.domainWord()}`,
-    ];
-
-    const promises = samples.map(url => request(this.app).get(url).expect(404));
-    await Promise.all(promises);
   });
 
   it('throws an error if data size more than 5kb', async () => {
