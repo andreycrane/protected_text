@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import type { Node } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -9,13 +9,23 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+
 
 export type TProps = $ReadOnly<{
   open: boolean,
   title: string,
   text: string,
+  error: boolean,
   onSave: (password: string) => void,
   onCancel: () => void,
+}>;
+
+
+export type TState = $ReadOnly<{
+  password: string,
+  repeatedPassword: string,
+  error: boolean,
 }>;
 
 export default function BasePasswordDialog(props: TProps): Node {
@@ -25,17 +35,31 @@ export default function BasePasswordDialog(props: TProps): Node {
     open,
     onSave,
     onCancel,
+    error,
   } = props;
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<TState>({
     password: '',
     repeatedPassword: '',
+    error,
   });
+
+  useEffect(
+    () => {
+      setState((prev: TState): TState => ({ ...prev, error }));
+    },
+    [error],
+  );
 
   const onPasswordChange = useCallback(
     (e) => {
       const { value } = e.target;
-      setState(prev => ({ ...prev, password: value }));
+
+      setState((prev: TState): TState => ({
+        ...prev,
+        password: value,
+        error: false,
+      }));
     },
     [setState],
   );
@@ -43,17 +67,45 @@ export default function BasePasswordDialog(props: TProps): Node {
   const onRepeatedPasswordChange = useCallback(
     (e) => {
       const { value } = e.target;
-      setState(prev => ({ ...prev, repeatedPassword: value }));
+
+      setState((prev: TState): TState => ({
+        ...prev,
+        repeatedPassword: value,
+        error: false,
+      }));
     },
     [setState],
   );
 
+  function validate(password, repeatedPassword): boolean {
+    if (password !== repeatedPassword) {
+      return false;
+    }
+
+    return true;
+  }
+
+
   function onSaveClick() {
     const { password, repeatedPassword } = state;
 
-    if (password === repeatedPassword) {
+    if (validate(password, repeatedPassword)) {
       onSave(password);
+    } else {
+      setState((prev: TState): TState => ({
+        ...prev,
+        error: true,
+      }));
     }
+  }
+
+  function onCancelClick() {
+    setState({
+      password: '',
+      repeatedPassword: '',
+      error: false,
+    });
+    onCancel();
   }
 
   return (
@@ -74,6 +126,7 @@ export default function BasePasswordDialog(props: TProps): Node {
           label="Password"
           type="password"
           fullWidth
+          error={state.error}
           value={state.password}
           onChange={onPasswordChange}
         />
@@ -84,8 +137,17 @@ export default function BasePasswordDialog(props: TProps): Node {
           type="password"
           fullWidth
           value={state.repeatedPassword}
+          error={state.error}
           onChange={onRepeatedPasswordChange}
         />
+        {state.error && (
+          <Typography
+            variant="body2"
+            color="error"
+          >
+            Invalid password!
+          </Typography>
+        )}
       </DialogContent>
       <DialogActions>
         <Button
@@ -95,7 +157,7 @@ export default function BasePasswordDialog(props: TProps): Node {
           Save
         </Button>
         <Button
-          onClick={onCancel}
+          onClick={onCancelClick}
         >
           Cancel
         </Button>

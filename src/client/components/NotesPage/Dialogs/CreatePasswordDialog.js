@@ -28,6 +28,7 @@ export default function CreatePasswordDialog(props: TProps): Node {
   return (
     <BasePasswordDialog
       open={state.matches('CREATE_PASSWORD')}
+      error={state.matches({ CREATE_PASSWORD: 'error' })}
       title="Create password"
       text="Longer passwords are more secure."
       onSave={onSave}
