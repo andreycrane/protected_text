@@ -26,6 +26,7 @@ export default function ChangePasswordDialog(props: TProps): Node {
   return (
     <BasePasswordDialog
       open={state.matches('CHANGE_PASSWORD')}
+      error={state.matches({ CHANGE_PASSWORD: 'error' })}
       title="Change password"
       text="Enter new password and click Save. Longer passwords are more secure."
       onSave={onSave}
