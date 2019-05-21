@@ -1,64 +1,37 @@
 // @flow
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import type { Node } from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
-import AccessAlarmIcon from '@material-ui/icons/AddCircle';
 import IconButton from '@material-ui/core/IconButton';
-import { withStyles } from '@material-ui/core/styles';
+import AddCircle from '@material-ui/icons/AddCircle';
 
 import TabLabel from './TabLabel';
-
-
-const styles = (): TStyles => ({
-  tabLine: {
-    order: '0',
-    flex: '0 1 auto',
-    alignSelf: 'auto',
-  },
-});
 
 export type TProps = $ReadOnly<{
   notes: TNotes,
   currentNoteId: string,
-  onNewNote: () => void,
+  onAddNote: () => boolean,
   onRemoveNote: (id: string) => void,
   onChangeCurrent: (newId: string) => void,
   classes: TStyles,
 }>;
 
-export function TabsLineComponent(props: TProps): Node {
+export default function DesktopLine(props: TProps): Node {
   const {
     notes,
     currentNoteId,
-    onNewNote,
-    onChangeCurrent,
     onRemoveNote,
+    onAddNote,
+    onChangeCurrent,
     classes,
   } = props;
 
-  const handleChangeCurrent = useCallback(
-    (event, value): void => onChangeCurrent(value),
-    [onChangeCurrent],
-  );
-
-  const handleAdd = useCallback(
-    (event): boolean => {
-      event.stopPropagation();
-      event.preventDefault();
-
-      onNewNote();
-
-      return false;
-    },
-    [onNewNote],
-  );
-
   return (
     <Tabs
-      onChange={handleChangeCurrent}
+      onChange={onChangeCurrent}
       value={currentNoteId}
       indicatorColor="primary"
       textColor="primary"
@@ -84,7 +57,7 @@ export function TabsLineComponent(props: TProps): Node {
         component="div"
         key="add_tab"
         value="add_tab"
-        onClick={handleAdd}
+        onClick={onAddNote}
         label={(
           <Grid
             container
@@ -96,7 +69,7 @@ export function TabsLineComponent(props: TProps): Node {
               <IconButton
                 color="primary"
               >
-                <AccessAlarmIcon />
+                <AddCircle />
               </IconButton>
             </Grid>
           </Grid>
@@ -105,5 +78,3 @@ export function TabsLineComponent(props: TProps): Node {
     </Tabs>
   );
 }
-
-export default withStyles(styles)(TabsLineComponent);
