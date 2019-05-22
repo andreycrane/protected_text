@@ -34,7 +34,7 @@ const styles = (): TStyles => ({
     alignItems: 'center',
   },
   paper: {
-    minWidth: '400px',
+    minWidth: '300px',
     maxWidth: '95vw',
     margin: '120px auto',
     padding: '10px 15px',

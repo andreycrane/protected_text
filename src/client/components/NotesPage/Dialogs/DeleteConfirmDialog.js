@@ -9,14 +9,16 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 export type TProps = $ReadOnly<{
+  fullScreen: boolean,
   state: mixed,
   send: (args: mixed) => void,
 }>;
 
-export default function DeleteConfirmDialog(props: TProps): Node {
-  const { state, send } = props;
+export function DeleteConfirmDialog(props: TProps): Node {
+  const { state, send, fullScreen } = props;
 
   const onYes = useCallback(
     (): void => send('OK'),
@@ -34,6 +36,7 @@ export default function DeleteConfirmDialog(props: TProps): Node {
       maxWidth="sm"
       disableBackdropClick
       disableEscapeKeyDown
+      fullScreen={fullScreen}
     >
       <DialogTitle>Delete site</DialogTitle>
       <DialogContent>
@@ -57,3 +60,5 @@ export default function DeleteConfirmDialog(props: TProps): Node {
     </Dialog>
   );
 }
+
+export default withMobileDialog()(DeleteConfirmDialog);

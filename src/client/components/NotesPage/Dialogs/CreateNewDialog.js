@@ -9,14 +9,16 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 export type TProps = $ReadOnly<{
+  fullScreen: boolean,
   state: mixed,
   send: (args: mixed) => void,
 }>;
 
-export default function CreateNewDialog(props: TProps): Node {
-  const { state, send } = props;
+export function CreateNewDialog(props: TProps): Node {
+  const { fullScreen, state, send } = props;
 
   const onCreateSite = useCallback((): void => send('CREATE_EMPTY'));
   function onCancel() {
@@ -28,6 +30,7 @@ export default function CreateNewDialog(props: TProps): Node {
       open={state.matches('FREE')}
       disableBackdropClick
       disableEscapeKeyDown
+      fullScreen={fullScreen}
     >
       <DialogTitle>Create new site?</DialogTitle>
       <DialogContent>
@@ -57,3 +60,5 @@ export default function CreateNewDialog(props: TProps): Node {
     </Dialog>
   );
 }
+
+export default withMobileDialog()(CreateNewDialog);

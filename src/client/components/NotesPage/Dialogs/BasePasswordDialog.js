@@ -10,9 +10,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 
 export type TProps = $ReadOnly<{
+  fullScreen: boolean,
   open: boolean,
   title: string,
   text: string,
@@ -28,7 +30,7 @@ export type TState = $ReadOnly<{
   error: boolean,
 }>;
 
-export default function BasePasswordDialog(props: TProps): Node {
+export function BasePasswordDialog(props: TProps): Node {
   const {
     title,
     text,
@@ -36,6 +38,7 @@ export default function BasePasswordDialog(props: TProps): Node {
     onSave,
     onCancel,
     error,
+    fullScreen,
   } = props;
 
   const [state, setState] = useState<TState>({
@@ -113,6 +116,7 @@ export default function BasePasswordDialog(props: TProps): Node {
       open={open}
       disableBackdropClick
       disableEscapeKeyDown
+      fullScreen={fullScreen}
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
@@ -165,3 +169,5 @@ export default function BasePasswordDialog(props: TProps): Node {
     </Dialog>
   );
 }
+
+export default withMobileDialog()(BasePasswordDialog);

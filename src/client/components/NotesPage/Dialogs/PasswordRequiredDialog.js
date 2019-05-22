@@ -9,8 +9,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
 
 export type TProps = $ReadOnly<{
+  fullScreen: boolean,
   state: mixed,
   send: (args: mixed) => void,
 }>;
@@ -21,8 +23,8 @@ export type TState = $ReadOnly<{
   helperText: string,
 }>;
 
-export default function PasswordRequiredDialog(props: TProps): Node {
-  const { state, send } = props;
+export function PasswordRequiredDialog(props: TProps): Node {
+  const { state, send, fullScreen } = props;
   const [localState, setLocalState] = useState<TState>({
     password: '',
     error: false,
@@ -65,6 +67,7 @@ export default function PasswordRequiredDialog(props: TProps): Node {
       open={state.matches('ENCRYPTED')}
       disableBackdropClick
       disableEscapeKeyDown
+      fullScreen={fullScreen}
     >
       <DialogTitle>Password required</DialogTitle>
       <DialogContent>
@@ -101,3 +104,5 @@ export default function PasswordRequiredDialog(props: TProps): Node {
     </Dialog>
   );
 }
+
+export default withMobileDialog()(PasswordRequiredDialog);
