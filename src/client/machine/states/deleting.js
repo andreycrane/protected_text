@@ -46,6 +46,9 @@ const DELETING = {
           },
         ],
       },
+      meta: {
+        message: 'Something went wrong while we tried to delete your notes',
+      },
     },
   },
 };

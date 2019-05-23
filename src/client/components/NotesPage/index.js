@@ -17,7 +17,7 @@ import {
   ChangePasswordDialog,
   CreatePasswordDialog,
   DeleteConfirmDialog,
-  SavingErrorDialog,
+  CommonErrorDialog,
 } from './Dialogs';
 
 
@@ -123,9 +123,14 @@ export function AppComponent(props: TProps): Node {
         state={state}
         send={send}
       />
-      <SavingErrorDialog
+      <CommonErrorDialog
         state={state}
         send={send}
+        matches={[
+          'INITIAL.error',
+          'SAVING.error',
+          'DELETING.error',
+        ]}
       />
     </CssBaseline>
   );

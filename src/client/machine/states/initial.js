@@ -28,6 +28,9 @@ const INITIAL = {
         REPEAT: 'get_site',
         CANCEL: '#machine.EXIT',
       },
+      meta: {
+        message: 'Something went wrong while we tried to get site data.',
+      },
     },
   },
 };

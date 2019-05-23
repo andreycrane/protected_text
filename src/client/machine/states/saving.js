@@ -35,6 +35,9 @@ const SAVING = {
           },
         ],
       },
+      meta: {
+        message: 'Something went wrong when we tried to save your notes. To try it again push the "Repeat" button',
+      },
     },
   },
 };

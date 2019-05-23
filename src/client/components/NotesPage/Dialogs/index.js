@@ -6,4 +6,4 @@ export { default as BasePasswordDialog } from './BasePasswordDialog';
 export { default as ChangePasswordDialog } from './ChangePasswordDialog';
 export { default as CreatePasswordDialog } from './CreatePasswordDialog';
 export { default as DeleteConfirmDialog } from './DeleteConfirmDialog';
-export { default as SavingErrorDialog } from './SavingErrorDialog';
+export { default as CommonErrorDialog } from './CommonErrorDialog';

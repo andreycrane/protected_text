@@ -10,14 +10,21 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 
+
 export type TProps = $ReadOnly<{
   fullScreen: boolean,
   state: mixed,
   send: (args: mixed) => void,
+  matches: $ReadOnlyArray<string>,
 }>;
 
-export function SavingErrorDialog(props: TProps): Node {
-  const { state, send, fullScreen } = props;
+export function CommonErrorDialog(props: TProps): Node {
+  const {
+    state,
+    send,
+    fullScreen,
+    matches,
+  } = props;
 
   function onRepeat() {
     send('REPEAT');
@@ -27,17 +34,33 @@ export function SavingErrorDialog(props: TProps): Node {
     send('CANCEL');
   }
 
+
+  function isOpen(): boolean {
+    return matches.some(s => state.matches(s));
+  }
+
+  function getErrorMessage(): string {
+    if (isOpen() === false) {
+      return '';
+    }
+
+    const pathes = state.toStrings();
+    const fullStatePath = `machine.${pathes[pathes.length - 1]}`;
+
+    return state.meta[fullStatePath].message;
+  }
+
   return (
     <Dialog
-      open={state.matches({ SAVING: 'error' })}
+      open={isOpen()}
       disableBackdropClick
       disableEscapeKeyDown
       fullScreen={fullScreen}
     >
-      <DialogTitle>Error while saving your notes</DialogTitle>
+      <DialogTitle>Something went wrong</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {'Something went wrong when we tried to save your notes. To try it again push the "Repeat" button'}
+          {getErrorMessage()}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
@@ -57,4 +80,4 @@ export function SavingErrorDialog(props: TProps): Node {
   );
 }
 
-export default withMobileDialog()(SavingErrorDialog);
+export default withMobileDialog()(CommonErrorDialog);
