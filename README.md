@@ -30,3 +30,13 @@ For developing server side of this application I've used next set:
   and serves static files
 - [Keyv](https://github.com/lukechilds/keyv) - consistent interface for key-value storages to store encrypted
   data
+
+## Testing
+
+For testing code of the application (client and server parts) I've used next:
+
+- [Jest](https://jestjs.io) - JavaScript testing framework
+- [SuperTest](https://github.com/visionmedia/supertest) - library for testing node.js HTTP servers
+
+Most important part of testing in this project is unit tests for xstate machine which manages application
+behaviour.
