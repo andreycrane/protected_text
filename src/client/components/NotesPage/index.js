@@ -17,6 +17,7 @@ import {
   ChangePasswordDialog,
   CreatePasswordDialog,
   DeleteConfirmDialog,
+  SavingErrorDialog,
 } from './Dialogs';
 
 
@@ -119,6 +120,10 @@ export function AppComponent(props: TProps): Node {
         send={send}
       />
       <DeleteConfirmDialog
+        state={state}
+        send={send}
+      />
+      <SavingErrorDialog
         state={state}
         send={send}
       />
