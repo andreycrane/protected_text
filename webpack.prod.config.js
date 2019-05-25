@@ -37,7 +37,7 @@ module.exports = {
           name: 'react',
         },
         material: {
-          test: /[\\/]node_modules[\\/]@material-ui/,
+          test: /[\\/]node_modules[\\/](@material-ui|jss)/,
           priority: 10,
           chunks: 'all',
           name: 'material',
